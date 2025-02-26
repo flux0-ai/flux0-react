@@ -6,9 +6,7 @@
   "main": "dist/index.mjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "exports": {
     "./test-utils": {
       "import": {
@@ -84,6 +82,7 @@
       "@semantic-release/github"
     ]
   },
+  "packageManager": "pnpm@10.3.0",
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.17.4",
     "@biomejs/biome": "^1.9.4",

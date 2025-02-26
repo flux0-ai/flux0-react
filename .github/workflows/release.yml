@@ -7,7 +7,10 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - run: corepack enable
+      # https://github.com/actions/setup-node/issues/1222
+      # once resolved, replace with `- run: corepack enable`
+      - name: Force Install Corepack and Enable
+        run: npm install -g corepack && corepack enable
       - uses: actions/checkout@v4
       - name: Setup Node.js
         uses: actions/setup-node@v4
