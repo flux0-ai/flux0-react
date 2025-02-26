@@ -1,11 +1,17 @@
 name: Release
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+      - beta
 jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # to be able to publish a GitHub release
+      issues: write # to be able to comment on released issues
+      pull-requests: write # to be able to comment on released pull requests
     steps:
       # https://github.com/actions/setup-node/issues/1222
       # once resolved, replace with `- run: corepack enable`
@@ -23,6 +29,6 @@ jobs:
         run: pnpm build
       - name: Release
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release
