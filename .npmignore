@@ -1,0 +1,29 @@
+# OS and System Files
+.DS_Store
+
+# Node Modules and Dependencies
+node_modules
+npm-debug.log
+pnpm-lock.yaml
+
+# Build and Output Directories
+dist/
+
+# Cache and Temporary Files
+.cache
+.tmp
+.sass-cache
+.eslintignore
+
+# Testing and Coverage
+coverage/
+tests
+__tests__
+jest-setup.js
+
+# IDE and Project Config Files
+.idea
+.project
+.editorconfig
+.flowconfig
+biome.json
