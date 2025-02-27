@@ -39,7 +39,8 @@
     "dev": "run-p dev:*",
     "dev:storybook": "pnpm --filter storybook dev",
     "storybook:build": "pnpm --filter storybook build",
-    "test": "vitest"
+    "test": "vitest",
+    "gen_client_sdk": "pnpx openapi-typescript http://localhost:8787/openapi.json -o ./src/api_v1.d.ts"
   },
   "keywords": [
     "openai",
