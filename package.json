@@ -13,11 +13,9 @@
   "exports": {
     "./test-utils": {
       "import": {
-        "types": "./dist/test-utils/index.d.mts",
         "default": "./dist/test-utils/index.mjs"
       },
       "require": {
-        "types": "./dist/test-utils/index.d.ts",
         "default": "./dist/test-utils/index.js"
       }
     },
