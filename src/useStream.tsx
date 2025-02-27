@@ -53,7 +53,6 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
       setError(null);
 
       const serverUrl = options.serverUrl.replace("{sessionId}", sessionId);
-      console.log(serverUrl);
 
       fetchEventSource(serverUrl, {
         method: "POST",
