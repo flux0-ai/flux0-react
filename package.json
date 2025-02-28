@@ -6,32 +6,34 @@
   },
   "description": "Flux0 React toolkit.",
   "type": "commonjs",
-  "main": "dist/index.mjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "dist/lib/index.mjs",
+  "module": "dist/lib/index.mjs",
+  "types": "dist/lib/index.d.ts",
   "files": ["dist"],
   "exports": {
     "./test-utils": {
       "import": {
+        "types": "./dist/test-utils/index.d.mts",
         "default": "./dist/test-utils/index.mjs"
       },
       "require": {
+        "types": "./dist/test-utils/index.d.ts",
         "default": "./dist/test-utils/index.js"
       }
     },
     ".": {
       "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
+        "types": "./dist/lib/index.d.mts",
+        "default": "./dist/lib/index.mjs"
       },
       "require": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
+        "types": "./dist/lib/index.d.ts",
+        "default": "./dist/lib/index.js"
       }
     }
   },
   "scripts": {
-    "prebuild": "rm -rf dist",
+    "prebuild": "rm -rf dist && rm -rf dist-test-utils",
     "dev:package": "tsup --watch",
     "build": "tsup",
     "postbuild": "attw --pack --profile node16 && publint",

@@ -13,7 +13,7 @@ export default defineConfig([
   {
     ...commons,
     entryPoints: ["src/index.tsx"],
-    outDir: "dist",
+    outDir: "dist/lib",
   },
   {
     ...commons,
