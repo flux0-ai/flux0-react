@@ -2,7 +2,7 @@ import { http, HttpResponse } from "msw";
 
 const encoder = new TextEncoder();
 
-const RECORDED_EVENTS = [
+export const RECORDED_EVENTS = [
   'event:some-event\ndata: {"id": "63678573-3ac5-45fe-b7b5-1cee2a8a0759", "source": "ai_agent", "type": "status", "correlation_id": "sess1", "data": {"type": "status", "acknowledged_offset": 0, "status": "processing", "data": {}}, "metadata": null}',
   `event:some-event\ndata: {"correlation_id": "sess1", "event_id": "63678573-3ac5-45fe-b7b5-1cee2a8a0759", "seq": 0, "patches": [{"op": "add", "path": "/tool_calls/0", "value": {"type": "tool_call", "tool_call_id": "call_fPZx5Enik4QvAdiGHmsvdeeE", "tool_name": "", "args": []}}, {"op": "replace", "path": "/tool_calls/0/tool_name", "value": "search"}], "metadata": {"agent_id": "foo", "agent_name": "test"}, "timestamp": 1740583796.796541}`,
   `event:some-event\ndata: {"correlation_id": "sess1", "event_id": "63678573-3ac5-45fe-b7b5-1cee2a8a0759", "seq": 0, "patches": [{"op": "add", "path": "/tool_calls/0/args/-", "value": "{\\""}], "metadata": {"agent_id": "foo", "agent_name": "test"}, "timestamp": 1740583796.7967858}`,

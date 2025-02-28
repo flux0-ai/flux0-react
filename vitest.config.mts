@@ -1,6 +1,10 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  // TODO https://github.com/hollandjake/mini-rfc6902/issues/13
+  define: {
+    "process.env": {},
+  },
   optimizeDeps: {
     include: ["@vitest/coverage-istanbul", "react", "react-dom/test-utils"],
   },
