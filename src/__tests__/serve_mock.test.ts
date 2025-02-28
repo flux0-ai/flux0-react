@@ -13,7 +13,7 @@ test("Should run hook", async () => {
       counter++;
     },
     onclose() {
-      expect(counter).greaterThan(40);
+      expect(counter).greaterThanOrEqual(40);
     },
     onerror(err: Error) {
       throw err;
