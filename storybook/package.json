@@ -24,8 +24,6 @@
     "@flux0-ai/react": "workspace:^"
   },
   "msw": {
-    "workerDirectory": [
-      "public"
-    ]
+    "workerDirectory": ["public"]
   }
 }
