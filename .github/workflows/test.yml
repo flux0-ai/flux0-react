@@ -1,0 +1,64 @@
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # https://github.com/actions/setup-node/issues/1222
+      # once resolved, replace with `- run: corepack enable`
+      - name: Force Install Corepack and Enable
+        run: npm install -g corepack && corepack enable
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install playwright
+        run: pnpm exec playwright install
+      - name: Lint
+        run: pnpm biome ci .
+      - name: Test
+        # preferrably with --coverage but fails due to: https://github.com/mswjs/msw/issues/2106
+        run: pnpm vitest
+        env:
+          CI: true
+      - name: Build
+        run: pnpm build
+
+  test_matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        react:
+          - 18
+          - 19
+          - latest
+    steps:
+      # https://github.com/actions/setup-node/issues/1222
+      # once resolved, replace with `- run: corepack enable`
+      - name: Force Install Corepack and Enable
+        run: npm install -g corepack && corepack enable
+      - uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Install React types
+        run: pnpm add -D @types/react@${{ matrix.react }} @types/react-dom@${{ matrix.react }}
+      - name: Install ${{ matrix.react }}
+        run: pnpm add -D react@${{ matrix.react }} react-dom@${{ matrix.react }}
+      - name: Validate types
+        run: pnpm tsc
+      - name: Run test
+        run: |
+          pnpm exec playwright install
+          pnpm test
