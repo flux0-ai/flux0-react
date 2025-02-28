@@ -37,12 +37,9 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
         console.error("Session ID is required");
         return;
       }
-      // Reset if switching sessions
-      if (sessionRef.current !== sessionId) {
-        sessionRef.current = sessionId;
-        setEvents([]);
-        eventQueueRef.current = [];
-      }
+      sessionRef.current = sessionId;
+      setEvents([]);
+      eventQueueRef.current = [];
       // Abort any existing stream
       if (controllerRef.current) {
         controllerRef.current.abort();
