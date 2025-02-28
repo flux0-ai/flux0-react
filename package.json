@@ -114,6 +114,6 @@
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
-    "mini-rfc6902": "^0.2.3"
+    "mini-rfc6902": "^0.3.0"
   }
 }

@@ -8,10 +8,5 @@ const config: StorybookConfig = {
     options: {},
   },
   staticDirs: ["../public"],
-  // TODO remove this once https://github.com/hollandjake/mini-rfc6902/issues/13
-  async viteFinal(config) {
-    config.define = { "process.env": {} };
-    return config;
-  },
 };
 export default config;
