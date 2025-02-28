@@ -4,415 +4,441 @@
  */
 
 export interface paths {
-    "/api/sessions/{session_id}/events/stream": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Stream Route */
-        post: operations["stream_route_api_sessions__session_id__events_stream_post"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+  "/api/sessions/{session_id}/events/stream": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
+    get?: never;
+    put?: never;
+    /** Stream Route */
+    post: operations["stream_route_api_sessions__session_id__events_stream_post"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: {
-        /**
-         * ChunkEvent
-         * @example {
-         *       "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
-         *       "event_id": "o5kf8vKzI5",
-         *       "metadata": {
-         *         "agent_id": "vUfk4PgjTm",
-         *         "agent_name": "Tala"
-         *       },
-         *       "patches": [
-         *         {
-         *           "op": "add",
-         *           "path": "/-",
-         *           "value": " currently"
-         *         }
-         *       ],
-         *       "seq": 0,
-         *       "timestamp": 1737495888
-         *     }
-         */
-        ChunkEventDTO: {
-            /**
-             * Id
-             * @description Unique identifier for the chunk event
-             */
-            id: string;
-            /**
-             * Event Id
-             * @description Unique identifier for the event
-             */
-            event_id: string;
-            /**
-             * Correlation Id
-             * @description Identifier linking related events together
-             */
-            correlation_id: string;
-            /**
-             * Seq
-             * @description Sequential position of the chunk
-             */
-            seq: number;
-            /** Patches */
-            patches: components["schemas"]["JsonPatchOperationDTO"][];
-            /** Metadata */
-            metadata: {
-                [key: string]: unknown;
-            };
-            /** Timestamp */
-            timestamp?: number;
-        };
-        /**
-         * ContentPart
-         * @example {
-         *       "text": "What's the weather in SF?",
-         *       "type": "text"
-         *     }
-         */
-        ContentPartDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "content";
-            /**
-             * Content
-             * @description Any valid JSON
-             */
-            content: unknown;
-        };
-        /** ControlOptions */
-        ControlOptions: {
-            /**
-             * Mode
-             * @enum {string}
-             */
-            mode: "auto" | "manual";
-        };
-        /**
-         * Event
-         * @example {
-         *       "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
-         *       "created_at": "2025-01-29T09:27:41Z",
-         *       "data": {
-         *         "participant": {
-         *           "display_name": "John Doe",
-         *           "id": "i5f9zYvtJ4"
-         *         },
-         *         "parts": [
-         *           {
-         *             "content": "The weather in San Francisco is currently 60 degrees and foggy.",
-         *             "type": "content"
-         *           }
-         *         ],
-         *         "type": "message"
-         *       },
-         *       "id": "o5kf8vKzI5",
-         *       "metadata": {
-         *         "agent_id": "vUfk4PgjTm",
-         *         "agent_name": "Tala"
-         *       },
-         *       "offset": 0,
-         *       "source": "user",
-         *       "type": "message"
-         *     }
-         */
-        EventDTO: {
-            /**
-             * Id
-             * @description Unique identifier for the event
-             */
-            id: string;
-            /**
-             * Correlation Id
-             * @description Identifier linking related events together
-             */
-            correlation_id: string;
-            source: components["schemas"]["EventSourceDTO"];
-            /**
-             * Offset
-             * @description Sequential position of the event in the session
-             */
-            offset: number;
-            /** Data */
-            data: components["schemas"]["MessageEventDataDTO"] | components["schemas"]["StatusEventDataDTO"] | components["schemas"]["ToolEventDataDTO"];
-            /** Metadata */
-            metadata?: {
-                [key: string]: unknown;
-            } | null;
-            /**
-             * Created At
-             * Format: date-time
-             * @description When the event was created
-             */
-            created_at: string;
-        };
-        /**
-         * EventSourceDTO
-         * @description Source of the event within a session.
-         *
-         *     Identifies who or what generated the event.
-         * @enum {string}
-         */
-        EventSourceDTO: "user" | "ai_agent" | "system";
-        /** HTTPValidationError */
-        HTTPValidationError: {
-            /** Detail */
-            detail?: components["schemas"]["ValidationError"][];
-        };
-        /**
-         * JsonPatchOperation
-         * @example {
-         *       "op": "add",
-         *       "path": "/a/b",
-         *       "value": 1
-         *     }
-         */
-        JsonPatchOperationDTO: {
-            /**
-             * Op
-             * @description The operation to perform
-             * @enum {string}
-             */
-            op: "add" | "replace";
-            /**
-             * Path
-             * @description The path to the target
-             */
-            path: string;
-            /**
-             * Value
-             * @description Any valid JSON
-             */
-            value: unknown;
-        };
-        /**
-         * MessageEventData
-         * @example {
-         *       "participant": {
-         *         "display_name": "John Doe",
-         *         "id": "i5f9zYvtJ4"
-         *       },
-         *       "parts": [
-         *         {
-         *           "text": "What's the weather in SF?",
-         *           "type": "text"
-         *         }
-         *       ]
-         *     }
-         */
-        MessageEventDataDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "message";
-            /** Tags */
-            tags?: string[] | null;
-            /** Flagged */
-            flagged?: boolean | null;
-            /** Parts */
-            parts: (components["schemas"]["ContentPartDTO"] | components["schemas"]["ReasoningPartDTO"] | components["schemas"]["ToolPartDTO"])[];
-            /** Participant */
-            participant?: {
-                [key: string]: string;
-            } | null;
-        };
-        /**
-         * ReasoningPart
-         * @example {
-         *       "reasoning": "The user has requested me to check the weather in SF, I should probably call the weather API for San Francisco.",
-         *       "type": "reasoning"
-         *     }
-         */
-        ReasoningPartDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "reasoning";
-            /**
-             * Reasoning
-             * @description Any valid JSON
-             */
-            reasoning: unknown;
-        };
-        /**
-         * StatusEventData
-         * @example {
-         *       "acknowledged_offset": 4,
-         *       "data": {
-         *         "exception": "Traceback (most recent call last):\n..."
-         *       },
-         *       "status": "error"
-         *     }
-         */
-        StatusEventDataDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "status";
-            status: components["schemas"]["StatusEventDataStatusField"];
-            /** Acknowledged Offset */
-            acknowledged_offset: number;
-            /** Data */
-            data?: unknown | null;
-        };
-        /**
-         * StatusEventDataStatusField
-         * @description Status of the event.
-         * @enum {string}
-         */
-        StatusEventDataStatusField: "acknowledged" | "cancelled" | "processing" | "ready" | "typing" | "error" | "completed";
-        /**
-         * ToolCall
-         * @example {
-         *       "args": {
-         *         "query": "San Francisco weather"
-         *       },
-         *       "result": "It's 60 degrees and foggy.",
-         *       "tool_call_id": "call01",
-         *       "tool_name": "search"
-         *     }
-         */
-        ToolCallDTO: {
-            /** Tool Call Id */
-            tool_call_id: string;
-            /** Tool Name */
-            tool_name: string;
-            /** Args */
-            args: {
-                [key: string]: unknown;
-            };
-            result?: components["schemas"]["ToolResultDTO"] | null;
-            /** Error */
-            error?: string | null;
-        };
-        /**
-         * ToolEventData
-         * @example {
-         *       "tool_calls": [
-         *         {
-         *           "args": {
-         *             "query": "San Francisco weather"
-         *           },
-         *           "result": "It's 60 degrees and foggy.",
-         *           "tool_call_id": "call01",
-         *           "tool_name": "search"
-         *         }
-         *       ]
-         *     }
-         */
-        ToolEventDataDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "tool_call_result";
-            /** Tool Calls */
-            tool_calls: components["schemas"]["ToolCallDTO"][];
-        };
-        /**
-         * ToolPart
-         * @example {
-         *       "args": {
-         *         "query": "San Francisco weather"
-         *       },
-         *       "tool_call_id": "call01",
-         *       "tool_name": "search",
-         *       "type": "typing.Literal['tool_call']"
-         *     }
-         */
-        ToolPartDTO: {
-            /**
-             * @description discriminator enum property added by openapi-typescript
-             * @enum {string}
-             */
-            type: "tool_call";
-            /** Tool Call Id */
-            tool_call_id: string;
-            /** Tool Name */
-            tool_name: string;
-            /**
-             * Args
-             * @description Any valid JSON
-             */
-            args: unknown;
-        };
-        /** ToolResult */
-        ToolResultDTO: {
-            /**
-             * Data
-             * @description Any valid JSON
-             */
-            data: unknown;
-            /** Metadata */
-            metadata: {
-                [key: string]: unknown;
-            };
-            control: components["schemas"]["ControlOptions"];
-        };
-        /** ValidationError */
-        ValidationError: {
-            /** Location */
-            loc: (string | number)[];
-            /** Message */
-            msg: string;
-            /** Error Type */
-            type: string;
-        };
+  schemas: {
+    /**
+     * ChunkEvent
+     * @example {
+     *       "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
+     *       "event_id": "o5kf8vKzI5",
+     *       "metadata": {
+     *         "agent_id": "vUfk4PgjTm",
+     *         "agent_name": "Tala"
+     *       },
+     *       "patches": [
+     *         {
+     *           "op": "add",
+     *           "path": "/-",
+     *           "value": " currently"
+     *         }
+     *       ],
+     *       "seq": 0,
+     *       "timestamp": 1737495888
+     *     }
+     */
+    ChunkEventDTO: {
+      /**
+       * Id
+       * @description Unique identifier for the chunk event
+       */
+      id: string;
+      /**
+       * Event Id
+       * @description Unique identifier for the event
+       */
+      event_id: string;
+      /**
+       * Correlation Id
+       * @description Identifier linking related events together
+       */
+      correlation_id: string;
+      /**
+       * Seq
+       * @description Sequential position of the chunk
+       */
+      seq: number;
+      /** Patches */
+      patches: components["schemas"]["JsonPatchOperationDTO"][];
+      /** Metadata */
+      metadata: {
+        [key: string]: unknown;
+      };
+      /** Timestamp */
+      timestamp?: number;
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
+    /**
+     * ContentPart
+     * @example {
+     *       "text": "What's the weather in SF?",
+     *       "type": "text"
+     *     }
+     */
+    ContentPartDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "content";
+      /**
+       * Content
+       * @description Any valid JSON
+       */
+      content: unknown;
+    };
+    /** ControlOptions */
+    ControlOptions: {
+      /**
+       * Mode
+       * @enum {string}
+       */
+      mode: "auto" | "manual";
+    };
+    /**
+     * Event
+     * @example {
+     *       "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
+     *       "created_at": "2025-01-29T09:27:41Z",
+     *       "data": {
+     *         "participant": {
+     *           "display_name": "John Doe",
+     *           "id": "i5f9zYvtJ4"
+     *         },
+     *         "parts": [
+     *           {
+     *             "content": "The weather in San Francisco is currently 60 degrees and foggy.",
+     *             "type": "content"
+     *           }
+     *         ],
+     *         "type": "message"
+     *       },
+     *       "id": "o5kf8vKzI5",
+     *       "metadata": {
+     *         "agent_id": "vUfk4PgjTm",
+     *         "agent_name": "Tala"
+     *       },
+     *       "offset": 0,
+     *       "source": "user",
+     *       "type": "message"
+     *     }
+     */
+    EventDTO: {
+      /**
+       * Id
+       * @description Unique identifier for the event
+       */
+      id: string;
+      /**
+       * Correlation Id
+       * @description Identifier linking related events together
+       */
+      correlation_id: string;
+      type: components["schemas"]["EventTypeDTO"];
+      source: components["schemas"]["EventSourceDTO"];
+      /**
+       * Offset
+       * @description Sequential position of the event in the session
+       */
+      offset: number;
+      /** Data */
+      data:
+        | components["schemas"]["MessageEventDataDTO"]
+        | components["schemas"]["StatusEventDataDTO"]
+        | components["schemas"]["ToolEventDataDTO"];
+      /** Metadata */
+      metadata?: {
+        [key: string]: unknown;
+      } | null;
+      /**
+       * Created At
+       * Format: date-time
+       * @description When the event was created
+       */
+      created_at: string;
+    };
+    /**
+     * EventSourceDTO
+     * @description Source of the event within a session.
+     *
+     *     Identifies who or what generated the event.
+     * @enum {string}
+     */
+    EventSourceDTO: "user" | "ai_agent" | "system";
+    /**
+     * EventTypeDTO
+     * @description Type of event that occurred within a session.
+     *
+     *     Represents different types of interactions that can occur within a conversation.
+     * @enum {string}
+     */
+    EventTypeDTO: "message" | "tool" | "status" | "custom";
+    /** HTTPValidationError */
+    HTTPValidationError: {
+      /** Detail */
+      detail?: components["schemas"]["ValidationError"][];
+    };
+    /**
+     * JsonPatchOperation
+     * @example {
+     *       "op": "add",
+     *       "path": "/a/b",
+     *       "value": 1
+     *     }
+     */
+    JsonPatchOperationDTO: {
+      /**
+       * Op
+       * @description The operation to perform
+       * @enum {string}
+       */
+      op: "add" | "replace";
+      /**
+       * Path
+       * @description The path to the target
+       */
+      path: string;
+      /**
+       * Value
+       * @description Any valid JSON
+       */
+      value: unknown;
+    };
+    /**
+     * MessageEventData
+     * @example {
+     *       "participant": {
+     *         "display_name": "John Doe",
+     *         "id": "i5f9zYvtJ4"
+     *       },
+     *       "parts": [
+     *         {
+     *           "text": "What's the weather in SF?",
+     *           "type": "text"
+     *         }
+     *       ]
+     *     }
+     */
+    MessageEventDataDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "message";
+      /** Tags */
+      tags?: string[] | null;
+      /** Flagged */
+      flagged?: boolean | null;
+      /** Parts */
+      parts: (
+        | components["schemas"]["ContentPartDTO"]
+        | components["schemas"]["ReasoningPartDTO"]
+        | components["schemas"]["ToolPartDTO"]
+      )[];
+      /** Participant */
+      participant?: {
+        [key: string]: string;
+      } | null;
+    };
+    /**
+     * ReasoningPart
+     * @example {
+     *       "reasoning": "The user has requested me to check the weather in SF, I should probably call the weather API for San Francisco.",
+     *       "type": "reasoning"
+     *     }
+     */
+    ReasoningPartDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "reasoning";
+      /**
+       * Reasoning
+       * @description Any valid JSON
+       */
+      reasoning: unknown;
+    };
+    /**
+     * StatusEventData
+     * @example {
+     *       "acknowledged_offset": 4,
+     *       "data": {
+     *         "exception": "Traceback (most recent call last):\n..."
+     *       },
+     *       "status": "error"
+     *     }
+     */
+    StatusEventDataDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "status";
+      status: components["schemas"]["StatusEventDataStatusField"];
+      /** Acknowledged Offset */
+      acknowledged_offset: number;
+      /** Data */
+      data?: unknown | null;
+    };
+    /**
+     * StatusEventDataStatusField
+     * @description Status of the event.
+     * @enum {string}
+     */
+    StatusEventDataStatusField:
+      | "acknowledged"
+      | "cancelled"
+      | "processing"
+      | "ready"
+      | "typing"
+      | "error"
+      | "completed";
+    /**
+     * ToolCall
+     * @example {
+     *       "args": {
+     *         "query": "San Francisco weather"
+     *       },
+     *       "result": "It's 60 degrees and foggy.",
+     *       "tool_call_id": "call01",
+     *       "tool_name": "search"
+     *     }
+     */
+    ToolCallDTO: {
+      /** Tool Call Id */
+      tool_call_id: string;
+      /** Tool Name */
+      tool_name: string;
+      /** Args */
+      args: {
+        [key: string]: unknown;
+      };
+      result?: components["schemas"]["ToolResultDTO"] | null;
+      /** Error */
+      error?: string | null;
+    };
+    /**
+     * ToolEventData
+     * @example {
+     *       "tool_calls": [
+     *         {
+     *           "args": {
+     *             "query": "San Francisco weather"
+     *           },
+     *           "result": "It's 60 degrees and foggy.",
+     *           "tool_call_id": "call01",
+     *           "tool_name": "search"
+     *         }
+     *       ]
+     *     }
+     */
+    ToolEventDataDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "tool_call_result";
+      /** Tool Calls */
+      tool_calls: components["schemas"]["ToolCallDTO"][];
+    };
+    /**
+     * ToolPart
+     * @example {
+     *       "args": {
+     *         "query": "San Francisco weather"
+     *       },
+     *       "tool_call_id": "call01",
+     *       "tool_name": "search",
+     *       "type": "typing.Literal['tool_call']"
+     *     }
+     */
+    ToolPartDTO: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      type: "tool_call";
+      /** Tool Call Id */
+      tool_call_id: string;
+      /** Tool Name */
+      tool_name: string;
+      /**
+       * Args
+       * @description Any valid JSON
+       */
+      args: unknown;
+    };
+    /** ToolResult */
+    ToolResultDTO: {
+      /**
+       * Data
+       * @description Any valid JSON
+       */
+      data: unknown;
+      /** Metadata */
+      metadata: {
+        [key: string]: unknown;
+      };
+      control: components["schemas"]["ControlOptions"];
+    };
+    /** ValidationError */
+    ValidationError: {
+      /** Location */
+      loc: (string | number)[];
+      /** Message */
+      msg: string;
+      /** Error Type */
+      type: string;
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    stream_route_api_sessions__session_id__events_stream_post: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                session_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Successful Response */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": (components["schemas"]["ChunkEventDTO"] | components["schemas"]["EventDTO"])[];
-                };
-            };
-            /** @description Validation Error */
-            422: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["HTTPValidationError"];
-                };
-            };
-        };
+  stream_route_api_sessions__session_id__events_stream_post: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        session_id: string;
+      };
+      cookie?: never;
     };
+    requestBody?: never;
+    responses: {
+      /** @description Successful Response */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": (
+            | components["schemas"]["ChunkEventDTO"]
+            | components["schemas"]["EventDTO"]
+          )[];
+        };
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
 }
