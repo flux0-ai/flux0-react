@@ -33,7 +33,7 @@
     }
   },
   "scripts": {
-    "prebuild": "rm -rf dist && rm -rf dist-test-utils",
+    "prebuild": "rm -rf dist",
     "dev:package": "tsup --watch",
     "build": "tsup",
     "postbuild": "attw --pack --profile node16 && publint",
