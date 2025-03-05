@@ -6,55 +6,61 @@ import { useStream } from "../useStream";
 import { test } from "./test_extended";
 
 test("should process empty events array", async () => {
-  const { result } = renderHook(() => useMessageStreamByEvents([]));
+  const { result } = renderHook(() =>
+    useMessageStreamByEvents({ emittedEvents: [] }),
+  );
   expect(result.current.isThinking).toBe(false);
-  expect(result.current.messages).toEqual(new Map());
+  expect(result.current.messages).toEqual([]);
 });
 
 test("should set isThinking if event is status", async () => {
   const { result } = renderHook(() =>
-    useMessageStreamByEvents([
-      {
-        id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
-        source: "ai_agent",
-        type: "status",
-        correlation_id: "sess1",
-        data: {
+    useMessageStreamByEvents({
+      emittedEvents: [
+        {
+          id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
+          source: "ai_agent",
           type: "status",
-          acknowledged_offset: 0,
-          status: "processing",
-          data: {},
+          correlation_id: "sess1",
+          data: {
+            type: "status",
+            acknowledged_offset: 0,
+            status: "processing",
+            data: {},
+          },
+          metadata: null,
+          offset: 0,
+          deleted: false,
+          created_at: "2021-08-26T14:00:00.000",
         },
-        metadata: null,
-        offset: 0,
-        created_at: "2021-08-26T14:00:00.000",
-      },
-    ]),
+      ],
+    }),
   );
 
   expect(result.current.isThinking).toBe(true);
-  expect(result.current.messages).toEqual(new Map());
+  expect(result.current.messages).toEqual([]);
 });
 
 test("should handle a new chunk", async () => {
   const { result } = renderHook(() =>
-    useMessageStreamByEvents([
-      {
-        id: "a1b2c3d4e5",
-        correlation_id: "sess1",
-        event_id: "event1",
-        seq: 0,
-        patches: [{ op: "add", path: "/-", value: "The" }],
-        metadata: { agent_id: "foo", agent_name: "test" },
-        timestamp: 1740583796.8028002,
-      },
-    ]),
+    useMessageStreamByEvents({
+      emittedEvents: [
+        {
+          id: "a1b2c3d4e5",
+          correlation_id: "sess1",
+          event_id: "event1",
+          seq: 0,
+          patches: [{ op: "add", path: "/-", value: "The" }],
+          metadata: { agent_id: "foo", agent_name: "test" },
+          timestamp: 1740583796.8028002,
+        },
+      ],
+    }),
   );
 
   expect(result.current.isThinking).toBe(false);
-  expect(Array.from(result.current.messages.entries())).toHaveLength(1);
-  expect(Array.from(result.current.messages.keys())).toEqual(["event1"]);
-  expect(result.current.messages.get("event1")?.content).toEqual(["The"]);
+  expect(result.current.messages).toHaveLength(1);
+  expect(result.current.messages[0].content).toEqual(["The"]);
 });
 
 test("should handle full run", async () => {
@@ -69,19 +75,12 @@ test("should handle full run", async () => {
   });
 
   const { result } = renderHook(() =>
-    useMessageStreamByEvents(useStreamResult.current.events),
+    useMessageStreamByEvents({ emittedEvents: useStreamResult.current.events }),
   );
 
   expect(result.current.isThinking).toBe(false);
-  expect(Array.from(result.current.messages.entries())).toHaveLength(2);
-  expect(Array.from(result.current.messages.keys())).toEqual([
-    "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
-    "17498459-6472-4034-9872-9d1eeeb77e03",
-  ]);
-  expect(
-    result.current.messages.get("17498459-6472-4034-9872-9d1eeeb77e03")
-      ?.content,
-  ).toEqual([
+  expect(result.current.messages).toHaveLength(2);
+  expect(result.current.messages[1]?.content).toEqual([
     "The",
     " weather",
     " in",
@@ -97,4 +96,32 @@ test("should handle full run", async () => {
     "gy",
     ".",
   ]);
+});
+
+test("should handle persisted events", async () => {
+  const { result } = renderHook(() =>
+    useMessageStreamByEvents({
+      emittedEvents: [
+        {
+          id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
+          source: "ai_agent",
+          type: "status",
+          correlation_id: "sess1",
+          data: {
+            type: "status",
+            acknowledged_offset: 0,
+            status: "processing",
+            data: {},
+          },
+          metadata: null,
+          offset: 0,
+          deleted: false,
+          created_at: "2021-08-26T14:00:00.000",
+        },
+      ],
+    }),
+  );
+
+  expect(result.current.isThinking).toBe(true);
+  expect(result.current.messages).toEqual([]);
 });

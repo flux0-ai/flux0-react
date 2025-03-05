@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import type { EmittedEvent } from "./types";
 
 export type StreamOptions = {
-  serverUrl: string;
+  serverUrl?: string;
 };
 
 const defaultStreamOptions: StreamOptions = {
@@ -49,7 +49,12 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
       setStreaming(true);
       setError(null);
 
-      const serverUrl = options.serverUrl.replace("{sessionId}", sessionId);
+      const template = options.serverUrl || defaultStreamOptions.serverUrl;
+      if (!template) {
+        console.error("Server URL is required");
+        return;
+      }
+      const serverUrl = template.replace("{sessionId}", sessionId);
 
       fetchEventSource(serverUrl, {
         method: "POST",

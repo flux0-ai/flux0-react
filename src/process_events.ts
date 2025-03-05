@@ -15,15 +15,69 @@ import type {
   ToolEventData,
 } from "./types";
 
+function processMessageEvent(
+  event: EmittedEvent | (Event & { data: MessageEventData }),
+): Message {
+  const messageEvent = event as Event & { data: MessageEventData };
+  const firstPart = messageEvent.data.parts[0];
+  const msg = {
+    id: messageEvent.id,
+    source: messageEvent.source,
+    content:
+      firstPart && firstPart.type === "content"
+        ? (firstPart.content as
+            | string
+            | string[]
+            | Record<string, unknown>
+            | undefined)
+        : undefined,
+    reasoning:
+      firstPart && firstPart.type === "reasoning"
+        ? (firstPart.reasoning as
+            | string
+            | Record<string, unknown>
+            | string[]
+            | undefined)
+        : undefined,
+    tool_calls: messageEvent.data.parts
+      .filter((part) => part.type === "tool_call")
+      .map((toolCall) => ({ ...toolCall, result: undefined })),
+    metadata: messageEvent.metadata,
+  };
+  return msg;
+}
+
+function processToolEvent(
+  event: (EmittedEvent | Event) & { data: ToolEventData },
+  messages: Map<string, Message>,
+): Map<string, Message> {
+  const toolEvent = event as Event & { data: ToolEventData };
+  for (const toolCallResult of toolEvent.data.tool_calls) {
+    const { tool_call_id, result } = toolCallResult;
+    for (const [messageId, message] of messages) {
+      const updatedToolCalls = message.tool_calls.map((toolCall) =>
+        toolCall.tool_call_id === tool_call_id
+          ? {
+              ...toolCall,
+              result: result ? (result as { data: unknown }).data : undefined,
+            }
+          : toolCall,
+      );
+      messages.set(messageId, { ...message, tool_calls: updatedToolCalls });
+    }
+  }
+  return messages;
+}
+
 /**
- * Process a single event and update the messages Map.
+ * Process a single emitted event and update the messages Map.
  *
  * @param messages - The current messages map.
  * @param event - The emitted event to process.
  * @param updateThinking - Callback to update "thinking" state.
  * @returns An updated messages Map.
  */
-export function processEvent(
+export function processEmittedEvent(
   messages: Map<string, Message>,
   event: EmittedEvent,
   updateThinking: (isThinking: boolean) => void,
@@ -41,53 +95,14 @@ export function processEvent(
 
   // Process Message events.
   if (isMessageEvent(event)) {
-    const messageEvent = event as Event & { data: MessageEventData };
-    const firstPart = messageEvent.data.parts[0];
-    messages.set(messageEvent.id, {
-      id: messageEvent.id,
-      source: messageEvent.source,
-      content:
-        firstPart && firstPart.type === "content"
-          ? (firstPart.content as
-              | string
-              | string[]
-              | Record<string, unknown>
-              | undefined)
-          : undefined,
-      reasoning:
-        firstPart && firstPart.type === "reasoning"
-          ? (firstPart.reasoning as
-              | string
-              | Record<string, unknown>
-              | string[]
-              | undefined)
-          : undefined,
-      tool_calls: messageEvent.data.parts
-        .filter((part) => part.type === "tool_call")
-        .map((toolCall) => ({ ...toolCall, result: undefined })),
-      metadata: messageEvent.metadata,
-    });
+    const msg = processMessageEvent(event);
+    messages.set(event.id, msg);
     return messages;
   }
 
   // Process Tool events.
   if (isToolEvent(event)) {
-    const toolEvent = event as Event & { data: ToolEventData };
-    for (const toolCallResult of toolEvent.data.tool_calls) {
-      const { tool_call_id, result } = toolCallResult;
-      for (const [messageId, message] of messages) {
-        const updatedToolCalls = message.tool_calls.map((toolCall) =>
-          toolCall.tool_call_id === tool_call_id
-            ? {
-                ...toolCall,
-                result: result ? (result as { data: unknown }).data : undefined,
-              }
-            : toolCall,
-        );
-        messages.set(messageId, { ...message, tool_calls: updatedToolCalls });
-      }
-    }
-    return messages;
+    return processToolEvent(event, messages);
   }
 
   // Process Chunk events (events with patches).
@@ -175,5 +190,42 @@ export function processEvent(
   }
 
   // If no condition matches, return the messages unmodified.
+  return messages;
+}
+
+/**
+ * Processes a persisted event and converts it into a message,
+ * updating the provided messages Map.
+ *
+ * This is a pure function that does not modify the input map but returns a new map
+ * with the event applied. It handles two event types:
+ *
+ * - "message" events: converts the event into a Message and adds it to the map.
+ * - "tool" events: updates existing messages that contain a matching tool_call_id.
+ *
+ * @param messages - The current map of messages keyed by their ID.
+ * @param event - The event to process.
+ * @returns A new Map of messages with the event processed.
+ */
+export function processEvent(
+  messages: Map<string, Message>,
+  event: Event,
+): Map<string, Message> {
+  if (isStatusEvent(event)) {
+    return messages;
+  }
+
+  if (isMessageEvent(event)) {
+    const msg = processMessageEvent(event);
+    messages.set(event.id, msg);
+    return messages;
+  }
+
+  if (isToolEvent(event)) {
+    return processToolEvent(event, messages);
+  }
+
+  // For events that don't match the handled kinds, return the messages unmodified.
+  console.warn("Unhandled event type:", event.type);
   return messages;
 }

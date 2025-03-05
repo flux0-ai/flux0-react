@@ -1,4 +1,5 @@
-import { type Event, type Message, useMessageStream } from "@flux0-ai/react";
+import type { Event, Message } from "@flux0-ai/react";
+import { useInitialEvents } from "@flux0-ai/react";
 import { handlers } from "@flux0-ai/react/test-utils";
 import type { Meta, StoryObj } from "@storybook/react";
 import { useState } from "react";
@@ -7,16 +8,15 @@ const StreamDemo = ({
   sessionId,
   serverUrl,
 }: { sessionId: string; serverUrl: string }) => {
-  const [loadedEvents, setLoadedEvents] = useState<Event[]>([]);
+  const [initialEvents, setInitialEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
-  const [input, setInput] = useState("");
 
   const handlePreloadEvents = () => {
     setLoadingEvents(true);
-    fetch(`/api/sessions/${sessionId}/events`)
+    fetch(serverUrl.replace("{sessionId}", sessionId))
       .then((res) => res.json())
       .then((data) => {
-        setLoadedEvents(data.data);
+        setInitialEvents(data.data);
         setLoadingEvents(false);
       })
       .catch((error) => {
@@ -25,14 +25,7 @@ const StreamDemo = ({
       });
   };
 
-  const {
-    messages,
-    streaming,
-    error,
-    startStreaming,
-    stopStreaming,
-    emittedEvents,
-  } = useMessageStream({ serverUrl, events: loadedEvents });
+  const { messages } = useInitialEvents({ events: initialEvents });
 
   return (
     <div
@@ -42,44 +35,21 @@ const StreamDemo = ({
         borderRadius: "8px",
       }}
     >
-      <h3>Stream Messages Demo</h3>
-      <p>A unified hook to handle both loaded events and event emissions</p>
-      <input
-        type="text"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        placeholder="Enter message..."
-        style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
-      />
+      <h3>Handle pre loaded events</h3>
+      <p>
+        This hook is responsible for loading previous events stored for the
+        session and transform them to Messages. Click{" "}
+        <span style={{ fontWeight: "bolder" }}>Load Session Events</span> to
+        load the events.
+      </p>
       <button
         type="button"
         onClick={handlePreloadEvents}
         disabled={loadingEvents}
-        style={{ marginRight: "8px" }}
+        style={{ marginLeft: "8px" }}
       >
-        {loadingEvents ? "Loading Events..." : "Preload Events"}
+        {loadingEvents ? "Loading Events..." : "Load session events"}
       </button>
-      <button
-        type="button"
-        onClick={() => startStreaming(sessionId, input)}
-        disabled={streaming}
-        style={{ marginRight: "8px" }}
-      >
-        Start Streaming
-      </button>
-      <button type="button" onClick={stopStreaming} disabled={!streaming}>
-        Stop Streaming
-      </button>
-      {error && <p style={{ color: "red" }}>Error: {error.message}</p>}
-      <h4>
-        <span>Streaming: {streaming ? "Yes" : "No"},</span>
-        <span style={{ marginLeft: "8px" }}>
-          Loaded Events: {loadedEvents.length},
-        </span>
-        <span style={{ marginLeft: "8px" }}>
-          Emitted Events: {emittedEvents.length}
-        </span>
-      </h4>
 
       <div
         style={{
@@ -91,6 +61,9 @@ const StreamDemo = ({
         }}
       >
         <h4>Messages {messages.length}</h4>
+        <span style={{ fontSize: 14 }}>
+          Processed events {initialEvents.length}
+        </span>
         {messages.length === 0 ? (
           <p>No messages yet...</p>
         ) : (
@@ -113,13 +86,13 @@ const StreamDemo = ({
 };
 
 const meta = {
-  title: "Hooks/useMessageStream",
+  title: "Hooks/useInitialEvents",
   component: StreamDemo,
   argTypes: {
     sessionId: { control: { type: "text" }, defaultValue: "sess123" },
     serverUrl: {
       control: { type: "text" },
-      defaultValue: "/api/sessions/{sessionId}/events/stream",
+      defaultValue: "/api/sessions/{sessionId}/events",
     },
   },
 } as Meta<typeof StreamDemo>;
@@ -136,6 +109,6 @@ export const Default: Story = {
   },
   args: {
     sessionId: "sess123",
-    serverUrl: "/api/sessions/{sessionId}/events/stream",
+    serverUrl: "/api/sessions/{sessionId}/events",
   },
 };

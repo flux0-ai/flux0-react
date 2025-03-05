@@ -1,4 +1,10 @@
 import { http, HttpResponse } from "msw";
+import {
+  AI_MESSAGE_CONTENT_EVENT,
+  PROCESSING_EVENT,
+  TYPING_EVENT,
+  USER_MESSAGE_EVENT,
+} from "./mocks";
 
 const encoder = new TextEncoder();
 
@@ -47,6 +53,13 @@ export const RECORDED_EVENTS = [
   // `event:some-event\ndata: {"id": "17498459-6472-4034-9872-9d1eeeb77e03", "source": "ai_agent", "type": "message", "correlation_id": "sess1", "data": {"type": "message", "parts": [{"type": "content", "content": "The weather in San Francisco is currently 60 degrees and foggy."}], "participant": {"id": "foo", "name": "test"}}, "metadata": {}}`,
 ];
 
+export const STORED_EVENTS = [
+  USER_MESSAGE_EVENT,
+  PROCESSING_EVENT,
+  TYPING_EVENT,
+  AI_MESSAGE_CONTENT_EVENT,
+];
+
 export const handlers = [
   http.post("/api/sessions/sess123/events/stream", () => {
     const stream = new ReadableStream({
@@ -66,5 +79,8 @@ export const handlers = [
         "Content-Type": "text/event-stream",
       },
     });
+  }),
+  http.get("/api/sessions/sess123/events", () => {
+    return HttpResponse.json({ data: STORED_EVENTS });
   }),
 ];

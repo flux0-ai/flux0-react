@@ -20,19 +20,19 @@ export function isEvent(event: EmittedEvent): event is Event {
 
 // Type guard for StatusEventData
 export function isStatusEvent(
-  event: EmittedEvent,
+  event: EmittedEvent | Event,
 ): event is Event & { data: StatusEventData } {
   return isEvent(event) && event.data.type === "status";
 }
 
 export function isMessageEvent(
-  event: EmittedEvent,
+  event: EmittedEvent | Event,
 ): event is EmittedEvent & { data: MessageEventData } {
   return isEvent(event) && event.data.type === "message";
 }
 
 export function isToolEvent(
-  event: EmittedEvent,
+  event: EmittedEvent | Event,
 ): event is EmittedEvent & { data: ToolEventData } {
   return isEvent(event) && event.data.type === "tool_call_result";
 }

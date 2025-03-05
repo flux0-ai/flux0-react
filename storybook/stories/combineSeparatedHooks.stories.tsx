@@ -1,12 +1,21 @@
-import { type Event, type Message, useMessageStream } from "@flux0-ai/react";
+import {
+  type Event,
+  type Message,
+  useInitialEvents,
+  useMessageStreamByEvents,
+  useStream,
+} from "@flux0-ai/react";
 import { handlers } from "@flux0-ai/react/test-utils";
 import type { Meta, StoryObj } from "@storybook/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const StreamDemo = ({
   sessionId,
   serverUrl,
-}: { sessionId: string; serverUrl: string }) => {
+}: {
+  sessionId: string;
+  serverUrl: string;
+}) => {
   const [loadedEvents, setLoadedEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [input, setInput] = useState("");
@@ -25,14 +34,24 @@ const StreamDemo = ({
       });
   };
 
+  const { messages: initialMessages } = useInitialEvents({
+    events: loadedEvents,
+  });
+  // Pass initialEvents to the hook
   const {
-    messages,
     streaming,
     error,
     startStreaming,
     stopStreaming,
+    events: emittedEvents,
+  } = useStream({ serverUrl });
+  const { messages: emittedMessages } = useMessageStreamByEvents({
     emittedEvents,
-  } = useMessageStream({ serverUrl, events: loadedEvents });
+  });
+
+  const messages = useMemo(() => {
+    return [...initialMessages, ...emittedMessages];
+  }, [initialMessages, emittedMessages]);
 
   return (
     <div
@@ -42,8 +61,7 @@ const StreamDemo = ({
         borderRadius: "8px",
       }}
     >
-      <h3>Stream Messages Demo</h3>
-      <p>A unified hook to handle both loaded events and event emissions</p>
+      <h3>Load hsitory and stream messages</h3>
       <input
         type="text"
         value={input}
@@ -51,14 +69,6 @@ const StreamDemo = ({
         placeholder="Enter message..."
         style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
       />
-      <button
-        type="button"
-        onClick={handlePreloadEvents}
-        disabled={loadingEvents}
-        style={{ marginRight: "8px" }}
-      >
-        {loadingEvents ? "Loading Events..." : "Preload Events"}
-      </button>
       <button
         type="button"
         onClick={() => startStreaming(sessionId, input)}
@@ -70,16 +80,16 @@ const StreamDemo = ({
       <button type="button" onClick={stopStreaming} disabled={!streaming}>
         Stop Streaming
       </button>
+      <button
+        type="button"
+        onClick={handlePreloadEvents}
+        disabled={loadingEvents}
+        style={{ marginLeft: "8px" }}
+      >
+        {loadingEvents ? "Loading Events..." : "Preload Events"}
+      </button>
       {error && <p style={{ color: "red" }}>Error: {error.message}</p>}
-      <h4>
-        <span>Streaming: {streaming ? "Yes" : "No"},</span>
-        <span style={{ marginLeft: "8px" }}>
-          Loaded Events: {loadedEvents.length},
-        </span>
-        <span style={{ marginLeft: "8px" }}>
-          Emitted Events: {emittedEvents.length}
-        </span>
-      </h4>
+      <h4>Streaming: {streaming ? "Yes" : "No"}</h4>
 
       <div
         style={{
@@ -91,6 +101,7 @@ const StreamDemo = ({
         }}
       >
         <h4>Messages {messages.length}</h4>
+        {/* <span style={{ fontSize: 14 }}>Processed events {events.length}</span> */}
         {messages.length === 0 ? (
           <p>No messages yet...</p>
         ) : (
@@ -113,7 +124,7 @@ const StreamDemo = ({
 };
 
 const meta = {
-  title: "Hooks/useMessageStream",
+  title: "Examples",
   component: StreamDemo,
   argTypes: {
     sessionId: { control: { type: "text" }, defaultValue: "sess123" },
@@ -128,7 +139,7 @@ export default meta;
 
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const Load_and_Stream: Story = {
   parameters: {
     msw: {
       handlers,

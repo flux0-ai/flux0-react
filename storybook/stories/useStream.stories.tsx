@@ -21,6 +21,10 @@ const StreamDemo = ({
       }}
     >
       <h3>Stream Demo</h3>
+      <p>
+        A more low level hook that submits user input and streams events for a
+        session.
+      </p>
       <input
         type="text"
         value={input}
