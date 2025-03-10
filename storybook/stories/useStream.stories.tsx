@@ -61,9 +61,10 @@ const StreamDemo = ({
         {events.length === 0 ? (
           <p>No events yet...</p>
         ) : (
-          events.map((event) => (
+          events.map((event, idx) => (
             <pre
-              key={event.id}
+              // biome-ignore lint/suspicious/noArrayIndexKey: TODO remove this once chunk event will have an id
+              key={idx}
               style={{
                 background: "#f5f5f5",
                 padding: "5px",

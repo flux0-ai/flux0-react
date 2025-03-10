@@ -43,10 +43,10 @@ const StreamDemo = ({
     error,
     startStreaming,
     stopStreaming,
-    events: emittedEvents,
+    events: sessionStream,
   } = useStream({ serverUrl });
   const { messages: emittedMessages } = useMessageStreamByEvents({
-    emittedEvents,
+    sessionStream,
   });
 
   const messages = useMemo(() => {

@@ -1,17 +1,17 @@
 import { apply } from "mini-rfc6902";
 import {
-  isChunkEvent,
   isMessageEvent,
   isStatusEvent,
+  isStreamChunkEvent,
+  isStreamStatusEvent,
   isToolEvent,
 } from "./type_utils";
 import type {
-  ChunkEvent,
   EmittedEvent,
   Event,
   Message,
   MessageEventData,
-  StatusEventData,
+  SessionStream,
   ToolEventData,
 } from "./types";
 
@@ -79,12 +79,12 @@ function processToolEvent(
  */
 export function processEmittedEvent(
   messages: Map<string, Message>,
-  event: EmittedEvent,
+  event: SessionStream,
   updateThinking: (isThinking: boolean) => void,
 ): Map<string, Message> {
   // Process Status events first.
-  if (isStatusEvent(event)) {
-    const statusData = event.data as StatusEventData;
+  if (isStreamStatusEvent(event)) {
+    const statusData = event.data.data;
     if (statusData.status === "processing") {
       updateThinking(true);
     } else if (statusData.status === "typing") {
@@ -93,21 +93,9 @@ export function processEmittedEvent(
     return messages;
   }
 
-  // Process Message events.
-  if (isMessageEvent(event)) {
-    const msg = processMessageEvent(event);
-    messages.set(event.id, msg);
-    return messages;
-  }
-
-  // Process Tool events.
-  if (isToolEvent(event)) {
-    return processToolEvent(event, messages);
-  }
-
   // Process Chunk events (events with patches).
-  if (isChunkEvent(event)) {
-    const { event_id, patches, metadata } = event as ChunkEvent;
+  if (isStreamChunkEvent(event)) {
+    const { event_id, patches, metadata } = event.data;
     if (!event_id) {
       console.error("Missing event_id on chunk event:", event);
       return messages;

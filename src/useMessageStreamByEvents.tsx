@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { processEmittedEvent } from "./process_events";
-import type { EmittedEvent, Message } from "./types";
+import { processEmittedEvent as processSessionStream } from "./process_events";
+import type { Message, SessionStream } from "./types";
 
 export type MessageStreamByEventsOptions = {
-  emittedEvents: EmittedEvent[];
+  sessionStream: SessionStream[];
 };
 
 /**
@@ -13,7 +13,7 @@ export type MessageStreamByEventsOptions = {
  * @returns { messages, isThinking, resetMessages }
  */
 export function useMessageStreamByEvents({
-  emittedEvents,
+  sessionStream,
 }: MessageStreamByEventsOptions): {
   messages: Message[];
   isThinking: boolean;
@@ -24,21 +24,21 @@ export function useMessageStreamByEvents({
   const lastProcessedIndexRef = useRef(0);
 
   useEffect(() => {
-    if (!emittedEvents?.length) return;
-    if (lastProcessedIndexRef.current >= emittedEvents.length) return;
+    if (!sessionStream?.length) return;
+    if (lastProcessedIndexRef.current >= sessionStream.length) return;
 
-    const newEvents = emittedEvents.slice(lastProcessedIndexRef.current);
+    const newEvents = sessionStream.slice(lastProcessedIndexRef.current);
     if (!newEvents.length) return;
 
     setMessages((currentMessages) =>
       newEvents.reduce(
-        (msgs, event) => processEmittedEvent(msgs, event, setIsThinking),
+        (msgs, event) => processSessionStream(msgs, event, setIsThinking),
         currentMessages,
       ),
     );
 
-    lastProcessedIndexRef.current = emittedEvents.length;
-  }, [emittedEvents]);
+    lastProcessedIndexRef.current = sessionStream.length;
+  }, [sessionStream]);
 
   const resetMessages = () => {
     setMessages(new Map());

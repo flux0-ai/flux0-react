@@ -11,7 +11,7 @@ import { type StreamOptions, useStream } from "./useStream";
 
 export type MessageStreamOptions = {} & InitialEventsOptions &
   StreamOptions &
-  Omit<MessageStreamByEventsOptions, "emittedEvents">;
+  Omit<MessageStreamByEventsOptions, "sessionStream">;
 
 export function useMessageStream({ serverUrl, events }: MessageStreamOptions) {
   const {
@@ -27,7 +27,7 @@ export function useMessageStream({ serverUrl, events }: MessageStreamOptions) {
     isThinking,
     resetMessages,
   } = useMessageStreamByEvents({
-    emittedEvents,
+    sessionStream: emittedEvents,
   });
 
   const { messages: loadedMessages } = useInitialEvents({

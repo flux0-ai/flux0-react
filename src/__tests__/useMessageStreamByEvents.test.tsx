@@ -1,5 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
-import { act } from "react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { expect } from "vitest";
 import { useMessageStreamByEvents } from "../useMessageStreamByEvents";
 import { useStream } from "../useStream";
@@ -7,7 +6,7 @@ import { test } from "./test_extended";
 
 test("should process empty events array", async () => {
   const { result } = renderHook(() =>
-    useMessageStreamByEvents({ emittedEvents: [] }),
+    useMessageStreamByEvents({ sessionStream: [] }),
   );
   expect(result.current.isThinking).toBe(false);
   expect(result.current.messages).toEqual([]);
@@ -16,22 +15,23 @@ test("should process empty events array", async () => {
 test("should set isThinking if event is status", async () => {
   const { result } = renderHook(() =>
     useMessageStreamByEvents({
-      emittedEvents: [
+      sessionStream: [
         {
           id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
-          source: "ai_agent",
-          type: "status",
-          correlation_id: "sess1",
+          event: "status",
           data: {
+            id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
+            source: "ai_agent",
             type: "status",
-            acknowledged_offset: 0,
-            status: "processing",
-            data: {},
+            correlation_id: "sess1",
+            data: {
+              type: "status",
+              acknowledged_offset: 0,
+              status: "processing",
+              data: {},
+            },
+            metadata: null,
           },
-          metadata: null,
-          offset: 0,
-          deleted: false,
-          created_at: "2021-08-26T14:00:00.000",
         },
       ],
     }),
@@ -44,15 +44,17 @@ test("should set isThinking if event is status", async () => {
 test("should handle a new chunk", async () => {
   const { result } = renderHook(() =>
     useMessageStreamByEvents({
-      emittedEvents: [
+      sessionStream: [
         {
-          id: "a1b2c3d4e5",
-          correlation_id: "sess1",
-          event_id: "event1",
-          seq: 0,
-          patches: [{ op: "add", path: "/-", value: "The" }],
-          metadata: { agent_id: "foo", agent_name: "test" },
-          timestamp: 1740583796.8028002,
+          event: "chunk",
+          data: {
+            correlation_id: "sess1",
+            event_id: "event1",
+            seq: 0,
+            patches: [{ op: "add", path: "/-", value: "The" }],
+            metadata: { agent_id: "foo", agent_name: "test" },
+            timestamp: 1740583796.8028002,
+          },
         },
       ],
     }),
@@ -75,7 +77,7 @@ test("should handle full run", async () => {
   });
 
   const { result } = renderHook(() =>
-    useMessageStreamByEvents({ emittedEvents: useStreamResult.current.events }),
+    useMessageStreamByEvents({ sessionStream: useStreamResult.current.events }),
   );
 
   expect(result.current.isThinking).toBe(false);
@@ -101,22 +103,23 @@ test("should handle full run", async () => {
 test("should handle persisted events", async () => {
   const { result } = renderHook(() =>
     useMessageStreamByEvents({
-      emittedEvents: [
+      sessionStream: [
         {
           id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
-          source: "ai_agent",
-          type: "status",
-          correlation_id: "sess1",
+          event: "status",
           data: {
+            id: "63678573-3ac5-45fe-b7b5-1cee2a8a0759",
+            source: "ai_agent",
             type: "status",
-            acknowledged_offset: 0,
-            status: "processing",
-            data: {},
+            correlation_id: "sess1",
+            data: {
+              type: "status",
+              acknowledged_offset: 0,
+              status: "processing",
+              data: {},
+            },
+            metadata: null,
           },
-          metadata: null,
-          offset: 0,
-          deleted: false,
-          created_at: "2021-08-26T14:00:00.000",
         },
       ],
     }),

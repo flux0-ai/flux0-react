@@ -4,6 +4,102 @@
  */
 
 export interface paths {
+  "/api/agents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Agents
+     * @description Retrieves a list of all agents in the system.
+     *
+     *     Returns an empty list if no agents exist.
+     *     Agents are returned in no guaranteed order.
+     */
+    get: operations["list_agents"];
+    put?: never;
+    /**
+     * Create Agent
+     * @description Creates a new agent with the specified parameters.
+     */
+    post: operations["create_agent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/agents/{agent_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Retrieve Agent
+     * @description Retrieves details of a specific agent by ID.
+     */
+    get: operations["retrieve_agent"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/sessions": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Sessions
+     * @description Retrieve all sessions that match the given filters.
+     *
+     *     Filters can be applied using agent_id. If no filters are specified, all sessions will be returned.
+     */
+    get: operations["list_sessions"];
+    put?: never;
+    /**
+     * Create a new session
+     * @description Create a new session bettween a user and an agent.
+     *
+     *     The session will be associated with the provided agent and optionally with a user.
+     *     If no user is provided, a guest user will be created.
+     */
+    post: operations["create_session"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/sessions/{session_id}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * Retrieve Session
+     * @description Retrieve details of a session by its unique identifier
+     */
+    get: operations["retrieve_session"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
   "/api/sessions/{session_id}/events/stream": {
     parameters: {
       query?: never;
@@ -13,8 +109,33 @@ export interface paths {
     };
     get?: never;
     put?: never;
-    /** Stream Route */
-    post: operations["stream_route_api_sessions__session_id__events_stream_post"];
+    /**
+     * Create and stream session events
+     * @description Creates a new event in the specified session and streams upcoming events.
+     */
+    post: operations["create_session_event"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/api/sessions/{session_id}/events": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    /**
+     * List Events
+     * @description List events for a session with optional filtering
+     *
+     *     Retrieves events that occurred within a session, optionally filtering by source, correlation ID, and types.
+     */
+    get: operations["list_session_events"];
+    put?: never;
+    post?: never;
     delete?: never;
     options?: never;
     head?: never;
@@ -26,13 +147,88 @@ export type webhooks = Record<string, never>;
 export interface components {
   schemas: {
     /**
+     * AgentCreationParams
+     * @example {
+     *       "description": "An agent that checks the weather",
+     *       "name": "Drizzle",
+     *       "type": "weather"
+     *     }
+     */
+    AgentCreationParamsDTO: {
+      /**
+       * Name
+       * @description The display name of the agent, mainly for representation purposes
+       */
+      name: string;
+      /**
+       * Type
+       * @description The type of the agent
+       */
+      type: string;
+      /** Description */
+      description?: string | null;
+    };
+    /**
+     * Agent
+     * @example {
+     *       "creation_utc": "2025-01-21T23:44:48",
+     *       "description": "An agent that checks the weather",
+     *       "id": "vUfk4PgjTm",
+     *       "name": "Drizzle",
+     *       "type": "weather"
+     *     }
+     */
+    AgentDTO: {
+      /**
+       * Id
+       * @description Unique identifier for the agent
+       */
+      id: string;
+      /**
+       * Name
+       * @description The display name of the agent, mainly for representation purposes
+       */
+      name: string;
+      /**
+       * Type
+       * @description The type of the agent
+       */
+      type: string;
+      /** Description */
+      description?: string | null;
+      /**
+       * Created At
+       * Format: date-time
+       * @description When the agent was created
+       */
+      created_at: string;
+    };
+    /**
+     * Agents
+     * @example {
+     *       "data": [
+     *         {
+     *           "creation_utc": "2025-01-21T23:44:48",
+     *           "description": "An agent that checks the weather",
+     *           "id": "vUfk4PgjTm",
+     *           "name": "Drizzle",
+     *           "type": "weather"
+     *         }
+     *       ]
+     *     }
+     */
+    AgentsDTO: {
+      /** Data */
+      data: components["schemas"]["AgentDTO"][];
+    };
+    /**
      * ChunkEvent
      * @example {
      *       "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
      *       "event_id": "o5kf8vKzI5",
      *       "metadata": {
      *         "agent_id": "vUfk4PgjTm",
-     *         "agent_name": "Tala"
+     *         "agent_name": "Drizzle"
      *       },
      *       "patches": [
      *         {
@@ -46,11 +242,6 @@ export interface components {
      *     }
      */
     ChunkEventDTO: {
-      /**
-       * Id
-       * @description Unique identifier for the chunk event
-       */
-      id: string;
       /**
        * Event Id
        * @description Unique identifier for the event
@@ -74,6 +265,26 @@ export interface components {
       };
       /** Timestamp */
       timestamp?: number;
+    };
+    /** ChunkEventStream */
+    ChunkEventStream: {
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      event: "chunk";
+      data: components["schemas"]["ChunkEventDTO"];
+    };
+    /**
+     * ConsumptionOffsets
+     * @description Tracks the state of message consumption.
+     * @example {
+     *       "client": 37
+     *     }
+     */
+    ConsumptionOffsetsDTO: {
+      /** Client */
+      client?: number | null;
     };
     /**
      * ContentPart
@@ -102,6 +313,59 @@ export interface components {
        */
       mode: "auto" | "manual";
     };
+    /** EmittedEvent */
+    EmittedEventDTO: {
+      /**
+       * Id
+       * @description Unique identifier for the event
+       */
+      id: string;
+      /**
+       * Correlation Id
+       * @description Identifier linking related events together
+       */
+      correlation_id: string;
+      type: components["schemas"]["EventTypeDTO"];
+      source: components["schemas"]["EventSourceDTO"];
+      /** Data */
+      data:
+        | components["schemas"]["MessageEventDataDTO"]
+        | components["schemas"]["StatusEventDataDTO"]
+        | components["schemas"]["ToolEventDataDTO"];
+      /** Metadata */
+      metadata?: {
+        [key: string]: unknown;
+      } | null;
+    };
+    /** EmittedEventStream */
+    EmittedEventStream: {
+      /**
+       * Id
+       * @description Unique identifier for the event
+       */
+      id: string;
+      /**
+       * @description discriminator enum property added by openapi-typescript
+       * @enum {string}
+       */
+      event: "status";
+      data: components["schemas"]["EmittedEventDTO"];
+    };
+    /**
+     * EventCreationParams
+     * @description Parameters for creating a new event within a session.
+     * @example {
+     *       "content": "What's the weather in SF?",
+     *       "kind": "message",
+     *       "source": "user"
+     *     }
+     */
+    EventCreationParamsDTO: {
+      type: components["schemas"]["EventTypeDTO"];
+      source: components["schemas"]["EventSourceDTO"];
+      /** Content */
+      content?: string | null;
+    };
     /**
      * Event
      * @example {
@@ -123,7 +387,7 @@ export interface components {
      *       "id": "o5kf8vKzI5",
      *       "metadata": {
      *         "agent_id": "vUfk4PgjTm",
-     *         "agent_name": "Tala"
+     *         "agent_name": "Drizzle"
      *       },
      *       "offset": 0,
      *       "source": "user",
@@ -153,6 +417,8 @@ export interface components {
         | components["schemas"]["MessageEventDataDTO"]
         | components["schemas"]["StatusEventDataDTO"]
         | components["schemas"]["ToolEventDataDTO"];
+      /** Deleted */
+      deleted: boolean;
       /** Metadata */
       metadata?: {
         [key: string]: unknown;
@@ -165,7 +431,7 @@ export interface components {
       created_at: string;
     };
     /**
-     * EventSourceDTO
+     * EventSource
      * @description Source of the event within a session.
      *
      *     Identifies who or what generated the event.
@@ -173,13 +439,49 @@ export interface components {
      */
     EventSourceDTO: "user" | "ai_agent" | "system";
     /**
-     * EventTypeDTO
+     * EventType
      * @description Type of event that occurred within a session.
      *
      *     Represents different types of interactions that can occur within a conversation.
      * @enum {string}
      */
     EventTypeDTO: "message" | "tool" | "status" | "custom";
+    /**
+     * Events
+     * @example {
+     *       "data": [
+     *         {
+     *           "correlation_id": "RID(lyH-sVmwJO)::Y8oBzYT4CQ",
+     *           "created_at": "2025-01-29T09:27:41Z",
+     *           "data": {
+     *             "participant": {
+     *               "display_name": "John Doe",
+     *               "id": "i5f9zYvtJ4"
+     *             },
+     *             "parts": [
+     *               {
+     *                 "content": "The weather in San Francisco is currently 60 degrees and foggy.",
+     *                 "type": "content"
+     *               }
+     *             ],
+     *             "type": "message"
+     *           },
+     *           "id": "o5kf8vKzI5",
+     *           "metadata": {
+     *             "agent_id": "vUfk4PgjTm",
+     *             "agent_name": "Drizzle"
+     *           },
+     *           "offset": 0,
+     *           "source": "user",
+     *           "type": "message"
+     *         }
+     *       ]
+     *     }
+     */
+    EventsDTO: {
+      /** Data */
+      data: components["schemas"]["EventDTO"][];
+    };
     /** HTTPValidationError */
     HTTPValidationError: {
       /** Detail */
@@ -267,6 +569,82 @@ export interface components {
       reasoning: unknown;
     };
     /**
+     * SessionCreationParams
+     * @example {
+     *       "agent_id": "vUfk4PgjTm",
+     *       "title": "What's the weather in SF?"
+     *     }
+     */
+    SessionCreationParamsDTO: {
+      /**
+       * Agent Id
+       * @description Unique identifier of the agent associated with the session.
+       */
+      agent_id: string;
+      /** Id */
+      id?: string | null;
+      /** Title */
+      title?: string | null;
+    };
+    /**
+     * Session
+     * @example {
+     *       "agent_id": "vUfk4PgjTm",
+     *       "created_at": "2025-01-29T09:27:41Z",
+     *       "id": "zv3h4j5Fjv",
+     *       "title": "The weather in SF",
+     *       "user_id": "v9pg5Zv3h4"
+     *     }
+     */
+    SessionDTO: {
+      /**
+       * Id
+       * @description Unique identifier of the session
+       */
+      id: string;
+      /**
+       * Agent Id
+       * @description Unique identifier of the agent associated with the session.
+       */
+      agent_id: string;
+      /**
+       * User Id
+       * @description Unique identifier of the user associated with the session.
+       */
+      user_id: string;
+      /** Title */
+      title?: string | null;
+      consumption_offsets: components["schemas"]["ConsumptionOffsetsDTO"];
+      /**
+       * Created At
+       * Format: date-time
+       * @description When the session was created
+       */
+      created_at: string;
+    };
+    /** SessionStream */
+    SessionStream:
+      | components["schemas"]["ChunkEventStream"]
+      | components["schemas"]["EmittedEventStream"];
+    /**
+     * Sessions
+     * @example {
+     *       "data": [
+     *         {
+     *           "agent_id": "vUfk4PgjTm",
+     *           "created_at": "2025-01-29T09:27:41Z",
+     *           "id": "zv3h4j5Fjv",
+     *           "title": "The weather in SF",
+     *           "user_id": "v9pg5Zv3h4"
+     *         }
+     *       ]
+     *     }
+     */
+    SessionsDTO: {
+      /** Data */
+      data: components["schemas"]["SessionDTO"][];
+    };
+    /**
      * StatusEventData
      * @example {
      *       "acknowledged_offset": 4,
@@ -284,7 +662,7 @@ export interface components {
       type: "status";
       status: components["schemas"]["StatusEventDataStatusField"];
       /** Acknowledged Offset */
-      acknowledged_offset: number;
+      acknowledged_offset?: number | null;
       /** Data */
       data?: unknown | null;
     };
@@ -407,27 +785,114 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-  stream_route_api_sessions__session_id__events_stream_post: {
+  list_agents: {
     parameters: {
       query?: never;
       header?: never;
-      path: {
-        session_id: string;
-      };
+      path?: never;
       cookie?: never;
     };
     requestBody?: never;
     responses: {
-      /** @description Successful Response */
+      /** @description List of all agents in the system */
       200: {
         headers: {
           [name: string]: unknown;
         };
         content: {
-          "application/json": (
-            | components["schemas"]["ChunkEventDTO"]
-            | components["schemas"]["EventDTO"]
-          )[];
+          "application/json": components["schemas"]["AgentsDTO"];
+        };
+      };
+    };
+  };
+  create_agent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["AgentCreationParamsDTO"];
+      };
+    };
+    responses: {
+      /** @description Agent created successfully, Returns the created agent along with its generated ID. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AgentDTO"];
+        };
+      };
+      /** @description Validation error in request parameters */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  retrieve_agent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Unique identifier for the agent */
+        agent_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Agent details successfully retrieved. Returns the complete agent object. */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AgentDTO"];
+        };
+      };
+      /** @description Agent not found. The specified `agent_id` does not exist */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  list_sessions: {
+    parameters: {
+      query?: {
+        agent_id?: string | null;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of all matching sessions */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionsDTO"];
         };
       };
       /** @description Validation Error */
@@ -438,6 +903,169 @@ export interface operations {
         content: {
           "application/json": components["schemas"]["HTTPValidationError"];
         };
+      };
+    };
+  };
+  create_session: {
+    parameters: {
+      query?: {
+        /** @description Indicates if the agent is permitted to send an initial greeting */
+        allow_greeting?: boolean;
+      };
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["SessionCreationParamsDTO"];
+      };
+    };
+    responses: {
+      /** @description Session created successfully, Returns the created session along with its generated ID. */
+      201: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionDTO"];
+        };
+      };
+      /** @description Validation error in request parameters */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  retrieve_session: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Unique identifier of the session */
+        session_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Session details retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SessionDTO"];
+        };
+      };
+      /** @description Session not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation Error */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["HTTPValidationError"];
+        };
+      };
+    };
+  };
+  create_session_event: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        /** @description Unique identifier of the session */
+        session_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["EventCreationParamsDTO"];
+      };
+    };
+    responses: {
+      /** @description Server-Sent Events (SSE) stream with structured event types */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "text/event-stream": components["schemas"]["SessionStream"];
+        };
+      };
+      /** @description Session not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation error in event parameters */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+    };
+  };
+  list_session_events: {
+    parameters: {
+      query?: {
+        min_offset?: number | null;
+        source?: components["schemas"]["EventSourceDTO"] | null;
+        correlation_id?: string | null;
+        types?: components["schemas"]["EventTypeDTO"][] | null;
+      };
+      header?: never;
+      path: {
+        /** @description Unique identifier of the session */
+        session_id: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description List of events matching the specified criteria */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["EventsDTO"];
+        };
+      };
+      /** @description Session not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Validation error in request parameters */
+      422: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
+      };
+      /** @description Request timeout waiting for new events */
+      504: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content?: never;
       };
     };
   };

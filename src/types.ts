@@ -1,8 +1,9 @@
 import type { components } from "./api_v1";
 
 export type ChunkEvent = components["schemas"]["ChunkEventDTO"];
+export type EmittedEvent = components["schemas"]["EmittedEventDTO"];
 export type Event = components["schemas"]["EventDTO"];
-export type EmittedEvent = ChunkEvent | Event;
+export type SessionStream = components["schemas"]["SessionStream"];
 export type StatusEventData = components["schemas"]["StatusEventDataDTO"];
 export type MessageEventData = components["schemas"]["MessageEventDataDTO"];
 export type ToolEventData = components["schemas"]["ToolEventDataDTO"];

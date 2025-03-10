@@ -1,6 +1,6 @@
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 import { useCallback, useRef, useState } from "react";
-import type { EmittedEvent } from "./types";
+import type { SessionStream } from "./types";
 
 export type StreamOptions = {
   serverUrl?: string;
@@ -14,12 +14,12 @@ const defaultStreamOptions: StreamOptions = {
  * A custom hook that encapsulates SSE events streaming.
  */
 export function useStream(options: StreamOptions = defaultStreamOptions) {
-  const [events, setEvents] = useState<EmittedEvent[]>([]);
+  const [events, setEvents] = useState<SessionStream[]>([]);
   const [streaming, setStreaming] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
   const sessionRef = useRef<string | null>(null);
-  const eventQueueRef = useRef<EmittedEvent[]>([]);
+  const eventQueueRef = useRef<SessionStream[]>([]);
 
   // Process the event queue asynchronously
   const processQueue = useCallback(() => {
@@ -63,25 +63,34 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
           Accept: "text/event-stream",
         },
         body: JSON.stringify({
-          kind: "message",
+          type: "message",
           content: input,
           source: "user",
         }),
         signal: controller.signal,
         openWhenHidden: false,
-        onmessage(event) {
+        onmessage(rawEvent) {
+          if (rawEvent.event !== "chunk" && rawEvent.event !== "status") {
+            console.error("Invalid event type:", rawEvent.event);
+            return;
+          }
           try {
-            const parsed: EmittedEvent = JSON.parse(event.data);
-            eventQueueRef.current.push(parsed);
+            const e: SessionStream = {
+              id: rawEvent.id,
+              event: rawEvent.event,
+              data: JSON.parse(rawEvent.data),
+            };
+            eventQueueRef.current.push(e);
             processQueue();
           } catch (e) {
-            console.error("Invalid JSON from SSE:", event.data, e);
+            console.error("Invalid JSON from SSE:", rawEvent.data, e);
           }
         },
         onclose() {
           setStreaming(false);
         },
         onerror(err: Error) {
+          alert(err);
           console.error("SSE error:", err);
           setError(err);
           setStreaming(false);
