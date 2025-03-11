@@ -9,7 +9,7 @@ import { test } from "./test_extended";
 const sessId = "sess123";
 test("should handle persisted events and streamed events", async () => {
   const { result } = renderHook(() =>
-    useMessageStream(sessId, { events: useMemo(() => STORED_EVENTS, []) }),
+    useMessageStream({ events: useMemo(() => STORED_EVENTS, []) }),
   );
 
   await act(async () => {
@@ -64,7 +64,7 @@ test("should handle persisted events and streamed events", async () => {
 
 test("should handle empty events", async () => {
   const { result } = renderHook(() =>
-    useMessageStream(sessId, { events: useMemo(() => [], []) }),
+    useMessageStream({ events: useMemo(() => [], []) }),
   );
 
   await act(async () => {
