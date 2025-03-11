@@ -13,7 +13,7 @@ test("should handle persisted events and streamed events", async () => {
   );
 
   await act(async () => {
-    result.current.startStreaming("Hello");
+    result.current.startStreaming(sessId, "Hello");
   });
   expect(result.current.streaming).toBe(true);
 
@@ -68,7 +68,7 @@ test("should handle empty events", async () => {
   );
 
   await act(async () => {
-    result.current.startStreaming("Hello");
+    result.current.startStreaming(sessId, "Hello");
   });
 
   // Wait for streaming to complete

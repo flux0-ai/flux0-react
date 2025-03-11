@@ -1,44 +1,40 @@
 import { type ReactNode, createContext, useContext } from "react";
 import { type StreamOptions, useStream } from "./useStream";
 
-// Define the context type based on the hook's return type.
-type StreamContextType = ReturnType<typeof useStream>;
+type StreamResult = ReturnType<typeof useStream>;
 
-// Create the context with an initial undefined value.
+// Define the context type
+type StreamContextType = {
+  stream: StreamResult;
+};
+
+// Create context
 const StreamContext = createContext<StreamContextType | undefined>(undefined);
 
 type StreamProviderProps = {
   children: ReactNode;
-  sessionId: string;
   options?: StreamOptions;
 };
 
-export const StreamProvider = ({
-  children,
-  sessionId,
-  options,
-}: StreamProviderProps) => {
-  const stream = useStream(sessionId, options);
+// Create provider
+export const StreamProvider = ({ children, options }: StreamProviderProps) => {
+  const stream = useStream(options);
 
   return (
-    <StreamContext.Provider value={stream}>{children}</StreamContext.Provider>
+    <StreamContext.Provider value={{ stream }}>
+      {children}
+    </StreamContext.Provider>
   );
 };
 
-// Custom hook for easy access to the stream context.
-export const useStreamContext = (): StreamContextType => {
+// Create a custom hook to access the stream
+export const useStreamContext = (options?: StreamOptions): StreamResult => {
   const context = useContext(StreamContext);
-  if (!context) {
-    throw new Error("useStreamContext must be used within a StreamProvider");
-  }
-  return context;
-};
 
-export const useStreamSource = (
-  sessionId: string,
-  options: StreamOptions = {},
-) => {
-  const context = useContext(StreamContext);
-  // If the context is available, return it; otherwise, call useStream directly.
-  return context ?? useStream(sessionId, options);
+  // If inside a provider and a session exists, return the provider's stream
+  if (context) {
+    return context.stream;
+  }
+
+  return useStream(options);
 };

@@ -32,7 +32,7 @@ const StreamDemo = ({
     startStreaming,
     stopStreaming,
     emittedEvents,
-  } = useMessageStream(sessionId, { serverTemplateUrl, events: loadedEvents });
+  } = useMessageStream({ serverTemplateUrl, events: loadedEvents });
 
   return (
     <div
@@ -61,7 +61,7 @@ const StreamDemo = ({
       </button>
       <button
         type="button"
-        onClick={() => startStreaming(input)}
+        onClick={() => startStreaming(sessionId, input)}
         disabled={streaming}
         style={{ marginRight: "8px" }}
       >

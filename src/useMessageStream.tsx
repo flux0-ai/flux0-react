@@ -8,16 +8,16 @@ import {
   useMessageStreamByEvents,
 } from "./useMessageStreamByEvents";
 import type { StreamOptions } from "./useStream";
-import { useStreamSource } from "./useStreamContext";
+import { useStreamContext } from "./useStreamContext";
 
 export type MessageStreamOptions = {} & InitialEventsOptions &
   StreamOptions &
   Omit<MessageStreamByEventsOptions, "sessionStream">;
 
-export function useMessageStream(
-  sessionId: string,
-  { serverTemplateUrl, events }: MessageStreamOptions,
-) {
+export function useMessageStream({
+  serverTemplateUrl,
+  events,
+}: MessageStreamOptions) {
   const streamOptions = useMemo(
     () => ({ serverTemplateUrl }),
     [serverTemplateUrl],
@@ -26,10 +26,11 @@ export function useMessageStream(
   const {
     events: emittedEvents,
     streaming,
+    resetEvents,
     startStreaming,
     stopStreaming,
     error,
-  } = useStreamSource(sessionId, streamOptions);
+  } = useStreamContext(streamOptions);
 
   const {
     messages: streamedMessages,
@@ -53,6 +54,7 @@ export function useMessageStream(
     emittedEvents,
     isThinking,
     streaming,
+    resetEvents,
     startStreaming,
     stopStreaming,
     error,

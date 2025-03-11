@@ -8,7 +8,6 @@ const StreamDemo = ({
   serverTemplateUrl,
 }: { sessionId: string; serverTemplateUrl: string }) => {
   const { events, streaming, error, startStreaming, stopStreaming } = useStream(
-    sessionId,
     { serverTemplateUrl },
   );
   const [input, setInput] = useState("");
@@ -35,7 +34,7 @@ const StreamDemo = ({
       />
       <button
         type="button"
-        onClick={() => startStreaming(input)}
+        onClick={() => startStreaming(sessionId, input)}
         disabled={streaming}
         style={{ marginRight: "8px" }}
       >

@@ -1,5 +1,5 @@
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { SessionStream } from "./types";
 
 export type StreamOptions = {
@@ -11,7 +11,9 @@ const DEFUALT_TEMPLATE_SERVER_URL = "/api/sessions/{sessionId}/events/stream";
 /**
  * A custom hook that encapsulates SSE events streaming.
  */
-export function useStream(sessionId: string, options: StreamOptions = {}) {
+export function useStream(
+  options: StreamOptions = { serverTemplateUrl: DEFUALT_TEMPLATE_SERVER_URL },
+) {
   const [events, setEvents] = useState<SessionStream[]>([]);
   const [streaming, setStreaming] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -25,15 +27,6 @@ export function useStream(sessionId: string, options: StreamOptions = {}) {
     eventQueueRef.current = [];
   }, []);
 
-  // If sessionId changes, clean up state.
-  const prevSessionIdRef = useRef<string>(sessionId);
-  useEffect(() => {
-    if (sessionId !== prevSessionIdRef.current) {
-      resetEvents();
-      prevSessionIdRef.current = sessionId;
-    }
-  }, [sessionId, resetEvents]);
-
   // Process the event queue asynchronously
   const processQueue = useCallback(() => {
     if (eventQueueRef.current.length > 0) {
@@ -46,7 +39,7 @@ export function useStream(sessionId: string, options: StreamOptions = {}) {
   }, []);
 
   const startStreaming = useCallback(
-    (input: string) => {
+    (sessionId: string, input: string) => {
       if (!sessionId) {
         console.error("Session ID is required");
         return;
@@ -111,7 +104,7 @@ export function useStream(sessionId: string, options: StreamOptions = {}) {
         },
       });
     },
-    [options.serverTemplateUrl, processQueue, sessionId],
+    [options.serverTemplateUrl, processQueue],
   );
 
   const stopStreaming = useCallback(() => {
@@ -126,6 +119,7 @@ export function useStream(sessionId: string, options: StreamOptions = {}) {
     events,
     streaming,
     error,
+    resetEvents,
     startStreaming,
     stopStreaming,
   };

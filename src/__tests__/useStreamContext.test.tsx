@@ -8,14 +8,14 @@ import { test } from "./test_extended";
 test("should provide stream context using StreamProvider", async () => {
   // Create a wrapper that includes the StreamProvider.
   const wrapper = ({ children }: { children: React.ReactNode }) => (
-    <StreamProvider sessionId="sess123">{children}</StreamProvider>
+    <StreamProvider>{children}</StreamProvider>
   );
 
   const { result } = renderHook(() => useStreamContext(), { wrapper });
 
   // Start streaming via the context
   act(() => {
-    result.current.startStreaming("Hello from context");
+    result.current.startStreaming("sess123", "Hello from context");
   });
 
   // Wait until streaming stops
@@ -28,8 +28,18 @@ test("should provide stream context using StreamProvider", async () => {
 });
 
 // Test that useStreamContext throws an error when used outside of a StreamProvider.
-test("should throw error when useStreamContext is used outside of StreamProvider", () => {
-  expect(() => renderHook(() => useStreamContext())).toThrow(
-    "useStreamContext must be used within a StreamProvider",
-  );
+test("should  fallback to hook if useStreamContext is used outside of StreamProvider", async () => {
+  const { result } = renderHook(() => useStreamContext());
+  // Start streaming via the context
+  act(() => {
+    result.current.startStreaming("sess123", "Hello from context");
+  });
+
+  // Wait until streaming stops
+  await waitFor(() => expect(result.current.streaming).toBe(false), {
+    timeout: 2000,
+  });
+
+  // Check that events were processed (assumes the SSE returns at least 39 events)
+  expect(result.current.events.length).toBeGreaterThanOrEqual(39);
 });

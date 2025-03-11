@@ -5,10 +5,10 @@ import { test } from "./test_extended";
 
 const sessId = "sess123";
 test("should start streaming and process received events", async () => {
-  const { result } = renderHook(() => useStream(sessId));
+  const { result } = renderHook(() => useStream());
 
   await act(async () => {
-    result.current.startStreaming("Hello");
+    result.current.startStreaming(sessId, "Hello");
   });
 
   // Wait for streaming to complete
@@ -21,10 +21,10 @@ test("should start streaming and process received events", async () => {
 });
 
 test("should handle SSE error correctly", async () => {
-  const { result } = renderHook(() => useStream("noSession123"));
+  const { result } = renderHook(() => useStream());
 
   act(() => {
-    result.current.startStreaming("Hello");
+    result.current.startStreaming("noSession123", "Hello");
   });
 
   // Wait for streaming to complete
@@ -39,10 +39,10 @@ test("should handle SSE error correctly", async () => {
 });
 
 test("should stop streaming", async () => {
-  const { result } = renderHook(() => useStream(sessId));
+  const { result } = renderHook(() => useStream());
 
   act(() => {
-    result.current.startStreaming("Hello");
+    result.current.startStreaming(sessId, "Hello");
   });
 
   // Ensure streaming starts

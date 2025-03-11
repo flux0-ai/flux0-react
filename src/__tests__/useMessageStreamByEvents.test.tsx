@@ -68,9 +68,9 @@ test("should handle a new chunk", async () => {
 });
 
 test("should handle full run", async () => {
-  const { result: useStreamResult } = renderHook(() => useStream(sessId));
+  const { result: useStreamResult } = renderHook(() => useStream());
   await act(async () => {
-    useStreamResult.current.startStreaming("Hello");
+    useStreamResult.current.startStreaming(sessId, "Hello");
   });
 
   // Wait for streaming to complete
