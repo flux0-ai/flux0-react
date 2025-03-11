@@ -4,6 +4,8 @@ import { useMessageStreamByEvents } from "../useMessageStreamByEvents";
 import { useStream } from "../useStream";
 import { test } from "./test_extended";
 
+const sessId = "sess123";
+
 test("should process empty events array", async () => {
   const { result } = renderHook(() =>
     useMessageStreamByEvents({ sessionStream: [] }),
@@ -66,9 +68,9 @@ test("should handle a new chunk", async () => {
 });
 
 test("should handle full run", async () => {
-  const { result: useStreamResult } = renderHook(() => useStream());
+  const { result: useStreamResult } = renderHook(() => useStream(sessId));
   await act(async () => {
-    useStreamResult.current.startStreaming("sess123", "Hello");
+    useStreamResult.current.startStreaming("Hello");
   });
 
   // Wait for streaming to complete

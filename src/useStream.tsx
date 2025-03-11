@@ -1,19 +1,17 @@
 import { fetchEventSource } from "@microsoft/fetch-event-source";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { SessionStream } from "./types";
 
 export type StreamOptions = {
-  serverUrl?: string;
+  serverTemplateUrl?: string;
 };
 
-const defaultStreamOptions: StreamOptions = {
-  serverUrl: "/api/sessions/{sessionId}/events/stream",
-};
+const DEFUALT_TEMPLATE_SERVER_URL = "/api/sessions/{sessionId}/events/stream";
 
 /**
  * A custom hook that encapsulates SSE events streaming.
  */
-export function useStream(options: StreamOptions = defaultStreamOptions) {
+export function useStream(sessionId: string, options: StreamOptions = {}) {
   const [events, setEvents] = useState<SessionStream[]>([]);
   const [streaming, setStreaming] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -21,18 +19,34 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
   const sessionRef = useRef<string | null>(null);
   const eventQueueRef = useRef<SessionStream[]>([]);
 
+  // Function to reset events and clear the queue.
+  const resetEvents = useCallback(() => {
+    setEvents([]);
+    eventQueueRef.current = [];
+  }, []);
+
+  // If sessionId changes, clean up state.
+  const prevSessionIdRef = useRef<string>(sessionId);
+  useEffect(() => {
+    if (sessionId !== prevSessionIdRef.current) {
+      resetEvents();
+      prevSessionIdRef.current = sessionId;
+    }
+  }, [sessionId, resetEvents]);
+
   // Process the event queue asynchronously
   const processQueue = useCallback(() => {
     if (eventQueueRef.current.length > 0) {
       const nextEvent = eventQueueRef.current.shift();
       if (!nextEvent) return;
+
       setEvents((prev) => [...prev, nextEvent]);
       setTimeout(processQueue, 0);
     }
   }, []);
 
   const startStreaming = useCallback(
-    (sessionId: string, input: string) => {
+    (input: string) => {
       if (!sessionId) {
         console.error("Session ID is required");
         return;
@@ -49,12 +63,9 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
       setStreaming(true);
       setError(null);
 
-      const template = options.serverUrl || defaultStreamOptions.serverUrl;
-      if (!template) {
-        console.error("Server URL is required");
-        return;
-      }
-      const serverUrl = template.replace("{sessionId}", sessionId);
+      const serverTemplateUrl =
+        options.serverTemplateUrl || DEFUALT_TEMPLATE_SERVER_URL;
+      const serverUrl = serverTemplateUrl.replace("{sessionId}", sessionId);
 
       fetchEventSource(serverUrl, {
         method: "POST",
@@ -90,7 +101,6 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
           setStreaming(false);
         },
         onerror(err: Error) {
-          alert(err);
           console.error("SSE error:", err);
           setError(err);
           setStreaming(false);
@@ -101,7 +111,7 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
         },
       });
     },
-    [options.serverUrl, processQueue],
+    [options.serverTemplateUrl, processQueue, sessionId],
   );
 
   const stopStreaming = useCallback(() => {
@@ -112,5 +122,11 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
     }
   }, []);
 
-  return { events, streaming, error, startStreaming, stopStreaming };
+  return {
+    events,
+    streaming,
+    error,
+    startStreaming,
+    stopStreaming,
+  };
 }

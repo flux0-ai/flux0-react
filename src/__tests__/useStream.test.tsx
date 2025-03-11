@@ -3,11 +3,12 @@ import { expect } from "vitest";
 import { useStream } from "../useStream";
 import { test } from "./test_extended";
 
+const sessId = "sess123";
 test("should start streaming and process received events", async () => {
-  const { result } = renderHook(() => useStream());
+  const { result } = renderHook(() => useStream(sessId));
 
   await act(async () => {
-    result.current.startStreaming("sess123", "Hello");
+    result.current.startStreaming("Hello");
   });
 
   // Wait for streaming to complete
@@ -20,10 +21,10 @@ test("should start streaming and process received events", async () => {
 });
 
 test("should handle SSE error correctly", async () => {
-  const { result } = renderHook(() => useStream());
+  const { result } = renderHook(() => useStream("noSession123"));
 
   act(() => {
-    result.current.startStreaming("error-case", "Hello");
+    result.current.startStreaming("Hello");
   });
 
   // Wait for streaming to complete
@@ -38,10 +39,10 @@ test("should handle SSE error correctly", async () => {
 });
 
 test("should stop streaming", async () => {
-  const { result } = renderHook(() => useStream());
+  const { result } = renderHook(() => useStream(sessId));
 
   act(() => {
-    result.current.startStreaming("test-session", "Hello");
+    result.current.startStreaming("Hello");
   });
 
   // Ensure streaming starts

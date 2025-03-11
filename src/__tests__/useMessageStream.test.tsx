@@ -6,13 +6,14 @@ import { AI_MESSAGE_CONTENT_EVENT, USER_MESSAGE_EVENT } from "../mocks/mocks";
 import { useMessageStream } from "../useMessageStream";
 import { test } from "./test_extended";
 
+const sessId = "sess123";
 test("should handle persisted events and streamed events", async () => {
   const { result } = renderHook(() =>
-    useMessageStream({ events: useMemo(() => STORED_EVENTS, []) }),
+    useMessageStream(sessId, { events: useMemo(() => STORED_EVENTS, []) }),
   );
 
   await act(async () => {
-    result.current.startStreaming("sess123", "Hello");
+    result.current.startStreaming("Hello");
   });
   expect(result.current.streaming).toBe(true);
 
@@ -63,11 +64,11 @@ test("should handle persisted events and streamed events", async () => {
 
 test("should handle empty events", async () => {
   const { result } = renderHook(() =>
-    useMessageStream({ events: useMemo(() => [], []) }),
+    useMessageStream(sessId, { events: useMemo(() => [], []) }),
   );
 
   await act(async () => {
-    result.current.startStreaming("sess123", "Hello");
+    result.current.startStreaming("Hello");
   });
 
   // Wait for streaming to complete

@@ -5,10 +5,11 @@ import { useState } from "react";
 
 const StreamDemo = ({
   sessionId,
-  serverUrl,
-}: { sessionId: string; serverUrl: string }) => {
+  serverTemplateUrl,
+}: { sessionId: string; serverTemplateUrl: string }) => {
   const { events, streaming, error, startStreaming, stopStreaming } = useStream(
-    { serverUrl },
+    sessionId,
+    { serverTemplateUrl },
   );
   const [input, setInput] = useState("");
 
@@ -34,7 +35,7 @@ const StreamDemo = ({
       />
       <button
         type="button"
-        onClick={() => startStreaming(sessionId, input)}
+        onClick={() => startStreaming(input)}
         disabled={streaming}
         style={{ marginRight: "8px" }}
       >
@@ -104,6 +105,6 @@ export const Default: Story = {
   },
   args: {
     sessionId: "sess123",
-    serverUrl: "/api/sessions/{sessionId}/events/stream",
+    serverTemplateUrl: "/api/sessions/{sessionId}/events/stream",
   },
 };

@@ -11,10 +11,10 @@ import { useMemo, useState } from "react";
 
 const StreamDemo = ({
   sessionId,
-  serverUrl,
+  serverTemplateUrl,
 }: {
   sessionId: string;
-  serverUrl: string;
+  serverTemplateUrl: string;
 }) => {
   const [loadedEvents, setLoadedEvents] = useState<Event[]>([]);
   const [loadingEvents, setLoadingEvents] = useState(false);
@@ -44,7 +44,7 @@ const StreamDemo = ({
     startStreaming,
     stopStreaming,
     events: sessionStream,
-  } = useStream({ serverUrl });
+  } = useStream(sessionId, { serverTemplateUrl });
   const { messages: emittedMessages } = useMessageStreamByEvents({
     sessionStream,
   });
@@ -71,7 +71,7 @@ const StreamDemo = ({
       />
       <button
         type="button"
-        onClick={() => startStreaming(sessionId, input)}
+        onClick={() => startStreaming(input)}
         disabled={streaming}
         style={{ marginRight: "8px" }}
       >
@@ -147,6 +147,6 @@ export const Load_and_Stream: Story = {
   },
   args: {
     sessionId: "sess123",
-    serverUrl: "/api/sessions/{sessionId}/events/stream",
+    serverTemplateUrl: "/api/sessions/{sessionId}/events/stream",
   },
 };

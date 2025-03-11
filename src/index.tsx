@@ -4,3 +4,4 @@ export { useInitialEvents } from "./useInitialEvents";
 export { useMessageStream } from "./useMessageStream";
 export { useMessageStreamByEvents } from "./useMessageStreamByEvents";
 export { StreamOptions, useStream } from "./useStream";
+export { StreamProvider, useStreamContext } from "./useStreamContext";

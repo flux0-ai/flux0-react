@@ -7,20 +7,29 @@ import {
   type MessageStreamByEventsOptions,
   useMessageStreamByEvents,
 } from "./useMessageStreamByEvents";
-import { type StreamOptions, useStream } from "./useStream";
+import type { StreamOptions } from "./useStream";
+import { useStreamSource } from "./useStreamContext";
 
 export type MessageStreamOptions = {} & InitialEventsOptions &
   StreamOptions &
   Omit<MessageStreamByEventsOptions, "sessionStream">;
 
-export function useMessageStream({ serverUrl, events }: MessageStreamOptions) {
+export function useMessageStream(
+  sessionId: string,
+  { serverTemplateUrl, events }: MessageStreamOptions,
+) {
+  const streamOptions = useMemo(
+    () => ({ serverTemplateUrl }),
+    [serverTemplateUrl],
+  );
+
   const {
     events: emittedEvents,
     streaming,
     startStreaming,
     stopStreaming,
     error,
-  } = useStream({ serverUrl });
+  } = useStreamSource(sessionId, streamOptions);
 
   const {
     messages: streamedMessages,
