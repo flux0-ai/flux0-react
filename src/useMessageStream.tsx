@@ -12,7 +12,7 @@ import { useStreamContext } from "./useStreamContext";
 
 export type MessageStreamOptions = {} & InitialEventsOptions &
   StreamOptions &
-  Omit<MessageStreamByEventsOptions, "sessionStream">;
+  Omit<MessageStreamByEventsOptions, "sessionStream" | "correlationId">;
 
 export function useMessageStream({
   serverTemplateUrl,
@@ -25,6 +25,7 @@ export function useMessageStream({
 
   const {
     events: emittedEvents,
+    correlationId,
     streaming,
     resetEvents,
     startStreaming,
@@ -37,6 +38,7 @@ export function useMessageStream({
     isThinking,
     resetMessages,
   } = useMessageStreamByEvents({
+    correlationId,
     sessionStream: emittedEvents,
   });
 

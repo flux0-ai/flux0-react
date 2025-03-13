@@ -3,6 +3,7 @@ import { processEmittedEvent as processSessionStream } from "./process_events";
 import type { Message, SessionStream } from "./types";
 
 export type MessageStreamByEventsOptions = {
+  correlationId: string;
   sessionStream: SessionStream[];
 };
 
@@ -13,6 +14,7 @@ export type MessageStreamByEventsOptions = {
  * @returns { messages, isThinking, resetMessages }
  */
 export function useMessageStreamByEvents({
+  correlationId,
   sessionStream,
 }: MessageStreamByEventsOptions): {
   messages: Message[];
@@ -22,6 +24,13 @@ export function useMessageStreamByEvents({
   const [messages, setMessages] = useState<Map<string, Message>>(new Map());
   const [isThinking, setIsThinking] = useState<boolean>(false);
   const lastProcessedIndexRef = useRef(0);
+
+  useEffect(() => {
+    if (correlationId) {
+      lastProcessedIndexRef.current = 0;
+      setMessages(new Map());
+    }
+  }, [correlationId]);
 
   useEffect(() => {
     if (!sessionStream?.length) return;

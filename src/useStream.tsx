@@ -14,6 +14,7 @@ const DEFUALT_TEMPLATE_SERVER_URL = "/api/sessions/{sessionId}/events/stream";
 export function useStream(
   options: StreamOptions = { serverTemplateUrl: DEFUALT_TEMPLATE_SERVER_URL },
 ) {
+  const [correlationId, setCorrelationId] = useState<string>("");
   const [events, setEvents] = useState<SessionStream[]>([]);
   const [streaming, setStreaming] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -84,6 +85,7 @@ export function useStream(
               event: rawEvent.event,
               data: JSON.parse(rawEvent.data),
             };
+            setCorrelationId(e.data.correlation_id);
             eventQueueRef.current.push(e);
             processQueue();
           } catch (e) {
@@ -117,6 +119,7 @@ export function useStream(
 
   return {
     events,
+    correlationId,
     streaming,
     error,
     resetEvents,

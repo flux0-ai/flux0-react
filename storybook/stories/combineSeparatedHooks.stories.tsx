@@ -37,15 +37,18 @@ const StreamDemo = ({
   const { messages: initialMessages } = useInitialEvents({
     events: loadedEvents,
   });
+
   // Pass initialEvents to the hook
   const {
     streaming,
+    correlationId,
     error,
     startStreaming,
     stopStreaming,
     events: sessionStream,
   } = useStream({ serverTemplateUrl });
   const { messages: emittedMessages } = useMessageStreamByEvents({
+    correlationId,
     sessionStream,
   });
 

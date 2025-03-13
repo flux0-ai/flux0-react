@@ -17,6 +17,7 @@ test("should start streaming and process received events", async () => {
   });
 
   expect(result.current.events.length).greaterThanOrEqual(39);
+  expect(result.current.correlationId).toBeDefined();
   expect(result.current.streaming).toBe(false);
 });
 

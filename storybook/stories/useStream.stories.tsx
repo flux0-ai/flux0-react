@@ -29,6 +29,12 @@ const StreamDemo = ({
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            setInput("");
+            startStreaming(sessionId, input);
+          }
+        }}
         placeholder="Enter message..."
         style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
       />
