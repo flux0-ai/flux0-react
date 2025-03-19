@@ -11,7 +11,7 @@ test("should process empty events array", async () => {
   const { result } = renderHook(() =>
     useMessageStreamByEvents({ correlationId: "1234", sessionStream: [] }),
   );
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.messages).toEqual([]);
 });
 
@@ -32,7 +32,9 @@ test("should set isThinking if event is status", async () => {
               type: "status",
               acknowledged_offset: 0,
               status: "processing",
-              data: {},
+              data: {
+                detail: "Thinking...",
+              },
             },
             metadata: null,
           },
@@ -41,7 +43,7 @@ test("should set isThinking if event is status", async () => {
     }),
   );
 
-  expect(result.current.isThinking).toBe(true);
+  expect(result.current.processing).toBe("Thinking...");
   expect(result.current.messages).toEqual([]);
 });
 
@@ -65,7 +67,7 @@ test("should handle a new chunk", async () => {
     }),
   );
 
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.messages).toHaveLength(1);
   expect(result.current.messages[0].content).toEqual(["The"]);
 });
@@ -101,7 +103,7 @@ test("should handle multi chunks within the same correlation", async () => {
     }),
   );
 
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.messages).toHaveLength(2);
   expect(result.current.messages[0].content).toEqual(["Foo"]);
   expect(result.current.messages[1].content).toEqual(["Bar"]);
@@ -125,7 +127,7 @@ test("should handle full run", async () => {
     }),
   );
 
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.messages).toHaveLength(2);
   expect(result.current.messages[1]?.content).toEqual([
     "The",
@@ -171,7 +173,7 @@ test("should handle persisted events", async () => {
     }),
   );
 
-  expect(result.current.isThinking).toBe(true);
+  expect(result.current.processing).toBe("thinking");
   expect(result.current.messages).toEqual([]);
 });
 

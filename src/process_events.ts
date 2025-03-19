@@ -80,15 +80,17 @@ function processToolEvent(
 export function processEmittedEvent(
   messages: Map<string, Message>,
   event: SessionStream,
-  updateThinking: (isThinking: boolean) => void,
+  updateThinking: (processing: string | undefined) => void,
 ): Map<string, Message> {
   // Process Status events first.
   if (isStreamStatusEvent(event)) {
     const statusData = event.data.data;
     if (statusData.status === "processing") {
-      updateThinking(true);
+      updateThinking(
+        (event.data.data.data as { detail?: string }).detail || "thinking",
+      );
     } else if (statusData.status === "typing") {
-      updateThinking(false);
+      updateThinking(undefined);
     }
     return messages;
   }

@@ -35,7 +35,7 @@ export function useMessageStream({
 
   const {
     messages: streamedMessages,
-    isThinking,
+    processing,
     resetMessages,
   } = useMessageStreamByEvents({
     correlationId,
@@ -54,7 +54,7 @@ export function useMessageStream({
   return {
     messages: Array.from(messages.values()),
     emittedEvents,
-    isThinking,
+    processing,
     streaming,
     resetEvents,
     startStreaming,

@@ -25,7 +25,7 @@ test("should handle persisted events and streamed events", async () => {
   });
 
   expect(result.current.streaming).toBe(false);
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.error).toBeNull();
   expect(result.current.messages.length).toEqual(4);
   expect(result.current.messages[0]).toEqual(
@@ -81,7 +81,7 @@ test("should handle empty events", async () => {
   });
 
   expect(result.current.streaming).toBe(false);
-  expect(result.current.isThinking).toBe(false);
+  expect(result.current.processing).toBe(undefined);
   expect(result.current.error).toBeNull();
   expect(result.current.messages.length).toEqual(2);
 });
