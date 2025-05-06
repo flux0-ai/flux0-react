@@ -67,7 +67,7 @@ export function useStream(options: StreamOptions = defaultStreamOptions) {
           source: "user",
         }),
         signal: controller.signal,
-        openWhenHidden: false,
+        openWhenHidden: true,
         onmessage(event) {
           try {
             const parsed: EmittedEvent = JSON.parse(event.data);
