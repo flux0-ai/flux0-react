@@ -36,6 +36,7 @@ export function useMessageStream({
   const {
     messages: streamedMessages,
     processing,
+    agentError,
     resetMessages,
   } = useMessageStreamByEvents({
     correlationId,
@@ -55,6 +56,7 @@ export function useMessageStream({
     messages: Array.from(messages.values()),
     emittedEvents,
     processing,
+    agentError,
     streaming,
     resetEvents,
     startStreaming,
