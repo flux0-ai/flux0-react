@@ -81,16 +81,22 @@ export function processEmittedEvent(
   messages: Map<string, Message>,
   event: SessionStream,
   updateThinking: (processing: string | undefined) => void,
+  setAgentError: (error: string | undefined) => void,
 ): Map<string, Message> {
   // Process Status events first.
   if (isStreamStatusEvent(event)) {
+    updateThinking(undefined);
+    setAgentError(undefined);
+    // Handle status events that indicate processing or error states.
     const statusData = event.data.data;
     if (statusData.status === "processing") {
       updateThinking(
-        (event.data.data.data as { detail?: string }).detail || "thinking",
+        (statusData.data as { detail?: string }).detail || "thinking",
       );
-    } else if (statusData.status === "typing") {
-      updateThinking(undefined);
+    } else if (statusData.status === "error") {
+      setAgentError(
+        (statusData.data as string) || "agent failed with unknown error",
+      );
     }
     return messages;
   }

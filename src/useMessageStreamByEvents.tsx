@@ -19,10 +19,12 @@ export function useMessageStreamByEvents({
 }: MessageStreamByEventsOptions): {
   messages: Message[];
   processing: string | undefined;
+  agentError: string | undefined;
   resetMessages: () => void;
 } {
   const [messages, setMessages] = useState<Map<string, Message>>(new Map());
   const [processing, setProcessing] = useState<string | undefined>();
+  const [agentError, setAgentError] = useState<string | undefined>();
   const lastProcessedIndexRef = useRef(0);
 
   useEffect(() => {
@@ -41,7 +43,8 @@ export function useMessageStreamByEvents({
 
     setMessages((currentMessages) =>
       newEvents.reduce(
-        (msgs, event) => processSessionStream(msgs, event, setProcessing),
+        (msgs, event) =>
+          processSessionStream(msgs, event, setProcessing, setAgentError),
         currentMessages,
       ),
     );
@@ -54,5 +57,10 @@ export function useMessageStreamByEvents({
     lastProcessedIndexRef.current = 0;
   };
 
-  return { messages: Array.from(messages.values()), processing, resetMessages };
+  return {
+    messages: Array.from(messages.values()),
+    processing,
+    agentError,
+    resetMessages,
+  };
 }
