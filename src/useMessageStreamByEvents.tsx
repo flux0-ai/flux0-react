@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { processEmittedEvent as processSessionStream } from "./process_events";
 import type { Message, SessionStream } from "./types";
 
@@ -49,10 +49,10 @@ export function useMessageStreamByEvents({
     lastProcessedIndexRef.current = sessionStream.length;
   }, [sessionStream]);
 
-  const resetMessages = () => {
+  const resetMessages = useCallback(() => {
     setMessages(new Map());
     lastProcessedIndexRef.current = 0;
-  };
+  }, []);
 
   return { messages: Array.from(messages.values()), processing, resetMessages };
 }

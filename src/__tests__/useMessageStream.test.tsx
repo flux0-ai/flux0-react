@@ -27,7 +27,7 @@ test("should handle persisted events and streamed events", async () => {
   expect(result.current.streaming).toBe(false);
   expect(result.current.processing).toBe(undefined);
   expect(result.current.error).toBeNull();
-  expect(result.current.messages.length).toEqual(4);
+  expect(result.current.messages.length).toEqual(5);
   expect(result.current.messages[0]).toEqual(
     expect.objectContaining({
       source: "user",
@@ -43,9 +43,18 @@ test("should handle persisted events and streamed events", async () => {
       ).parts[0].content,
     }),
   );
-  expect(result.current.messages[2]).toHaveProperty("tool_calls");
-  expect(result.current.messages[2].source).toBe("ai_agent");
-  expect(result.current.messages[3].content).toEqual([
+
+  // Test for messages[2]: user event with content "Hello"
+  expect(result.current.messages[2]).toEqual(
+    expect.objectContaining({
+      source: "user",
+      content: "Hello",
+    }),
+  );
+
+  expect(result.current.messages[3]).toHaveProperty("tool_calls");
+  expect(result.current.messages[3].source).toBe("ai_agent");
+  expect(result.current.messages[4].content).toEqual([
     "The",
     " weather",
     " in",
@@ -61,7 +70,7 @@ test("should handle persisted events and streamed events", async () => {
     "gy",
     ".",
   ]);
-  expect(result.current.messages[3].source).toBe("ai_agent");
+  expect(result.current.messages[4].source).toBe("ai_agent");
 });
 
 test("should handle empty events", async () => {
@@ -83,5 +92,5 @@ test("should handle empty events", async () => {
   expect(result.current.streaming).toBe(false);
   expect(result.current.processing).toBe(undefined);
   expect(result.current.error).toBeNull();
-  expect(result.current.messages.length).toEqual(2);
+  expect(result.current.messages.length).toEqual(3);
 });

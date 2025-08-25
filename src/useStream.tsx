@@ -46,7 +46,6 @@ export function useStream(
         return;
       }
       sessionRef.current = sessionId;
-      setEvents([]);
       eventQueueRef.current = [];
       // Abort any existing stream
       if (controllerRef.current) {
