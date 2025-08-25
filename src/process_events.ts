@@ -97,6 +97,7 @@ export function processEmittedEvent(
 
   // Process Chunk events (events with patches).
   if (isStreamChunkEvent(event)) {
+    updateThinking(undefined);
     const { event_id, patches, metadata } = event.data;
     if (!event_id) {
       console.error("Missing event_id on chunk event:", event);
