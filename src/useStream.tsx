@@ -73,7 +73,7 @@ export function useStream(
           source: "user",
         }),
         signal: controller.signal,
-        openWhenHidden: false,
+        openWhenHidden: true,
         onmessage(rawEvent) {
           if (rawEvent.event !== "chunk" && rawEvent.event !== "status") {
             console.error("Invalid event type:", rawEvent.event);
